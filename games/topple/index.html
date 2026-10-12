@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:," />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Topple</title>
+    <style>
+      /* Beats theme.css's :root so the letterbox bars match the sky. */
+      html:root { --bg: #2f6f8f; }
+      body { overflow: hidden; }
+      #stage { position: fixed; inset: 0; touch-action: none; }
+      /* The game is landscape; on a portrait phone, suggest turning it (it still plays as is). */
+      #rotate {
+        display: none;
+        position: fixed;
+        left: 50%;
+        bottom: 24px;
+        transform: translateX(-50%);
+        z-index: 5;
+        font-size: 15px;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0.85;
+      }
+      @media (orientation: portrait) and (max-width: 700px) {
+        #rotate { display: block; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage"></div>
+    <div id="rotate" class="btn">↻ Turn sideways for a bigger view</div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

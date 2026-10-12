@@ -44,7 +44,7 @@ Status: ✅ done · 🚧 in progress · ⬜ idea
 | ✅ | Duck Shoot | Shooting Gallery, Voiceover, Desert Shooter sounds | Fairground gallery: ducks and targets glide on rows, 60s timer, ammo and reload, ring scoring. |
 | ✅ | Donut Splat | Donuts, Splat Pack | Fruit Ninja with donuts. Swipes leave paint splats. |
 | ✅ | Tappy Plane | Tappy Plane, Foley + Retro sounds, Voiceover | Flappy Bird through rock spikes: random plane and terrain each round, puff trails, medals on the GAME OVER card. |
-| ⬜ | Topple | Physics Assets | Angry Birds-style knock-the-blocks-down physics. |
+| ✅ | Topple | Physics Assets, Explosion Pack, Impact Sounds | Angry Birds-style slingshot: 8 levels of wood, glass, stone and TNT towers with aliens to knock off, stars per level. |
 | ⬜ | Tilt Maze | Rolling Ball Assets | Tilt a board (device tilt or arrows) to roll a ball to the goal. |
 | ⬜ | Fish Frenzy | Fish Pack | Eat smaller fish, grow, avoid bigger ones. |
 | ⬜ | Abduction | Alien UFO Pack | Tractor-beam cows before the timer ends. |
