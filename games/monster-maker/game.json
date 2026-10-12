@@ -1,0 +1,17 @@
+{
+  "title": "Monster Maker",
+  "description": "Build a monster from parts, stick googly eyes on it and make it dance.",
+  "thumbnail": "2D assets/Monster Builder Pack/Sample.png",
+  "assets": [
+    "2D assets/Monster Builder Pack/Spritesheet/spritesheet_double.*",
+    "2D assets/Googly Eyes/Layers/*.png",
+    "2D assets/Googly Eyes/PNG/googly-a.png",
+    "Audio/Interface Sounds/Audio/drop_00[1-4].ogg",
+    "Audio/Interface Sounds/Audio/select_00[1-3].ogg",
+    "Audio/Interface Sounds/Audio/minimize_00[1-3].ogg",
+    "Audio/Interface Sounds/Audio/switch_00[1-3].ogg",
+    "Audio/Interface Sounds/Audio/confirmation_001.ogg",
+    "Audio/Music Jingles/Audio (Pizzicato)/jingles-pizzicato_0[0-9].ogg",
+    "Audio/Music Loops/Loops/Swinging Pants.ogg"
+  ]
+}

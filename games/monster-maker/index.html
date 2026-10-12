@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:," />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Monster Maker</title>
+  </head>
+  <body>
+    <div id="stage"></div>
+    <p id="hint" class="hint">Pick a body to start, or hit <strong>Random</strong></p>
+
+    <div class="actions">
+      <button id="random" class="primary" title="Random monster (R)">Random</button>
+      <button id="dance" aria-pressed="false" title="Dance (Space)">Dance</button>
+      <button id="save" title="Save as PNG">Save</button>
+      <button id="clear" class="danger" title="Clear everything">Clear</button>
+    </div>
+
+    <div id="selection" class="selection" hidden>
+      <button data-op="rotate-left" title="Rotate left (Q)">⟲</button>
+      <button data-op="rotate-right" title="Rotate right (E)">⟳</button>
+      <button data-op="smaller" title="Smaller (-)">−</button>
+      <button data-op="bigger" title="Bigger (+)">+</button>
+      <button data-op="flip" title="Flip (F)">Flip</button>
+      <button data-op="front" title="Bring to front (])">Front</button>
+      <button data-op="back" title="Send to back ([)">Back</button>
+      <button data-op="duplicate" title="Duplicate (D)">Copy</button>
+      <button data-op="delete" class="danger" title="Delete (Del)">✕</button>
+    </div>
+
+    <nav class="palette">
+      <div id="tabs" class="tabs" role="tablist"></div>
+      <div id="items" class="items"></div>
+    </nav>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
