@@ -1,17 +1,37 @@
 # Kenney Toys
 
-Little browser games built on the Kenney All-in-1 asset bundle. One Vite + TypeScript project. Each game is its own page, and a launcher at the root links to them all.
+Small, instantly fun browser games, each built around one [Kenney](https://kenney.nl) asset pack. Every game is short and works with a mouse, keyboard or touch.
+
+**▶ Play them at [toys.projectz.co.nz](https://toys.projectz.co.nz)**
+
+![The Kenney Toys launcher](docs/screenshots/launcher.webp)
+
+## Games
+
+| | Game | Built from |
+|---|---|---|
+| <img src="docs/screenshots/monster-maker.webp" width="240" alt="Monster Maker"> | **[Monster Maker](https://toys.projectz.co.nz/games/monster-maker/)**<br>Build a monster from parts, stick googly eyes on it that follow your cursor, make it dance and save it as a PNG. | Monster Builder Pack, Googly Eyes |
+| <img src="docs/screenshots/duck-shoot.webp" width="240" alt="Duck Shoot"> | **[Duck Shoot](https://toys.projectz.co.nz/games/duck-shoot/)**<br>Fairground shooting gallery. Pop ducks and bullseyes before the minute's up, and don't forget to reload. | Shooting Gallery |
+| <img src="docs/screenshots/donut-splat.webp" width="240" alt="Donut Splat"> | **[Donut Splat](https://toys.projectz.co.nz/games/donut-splat/)**<br>Swipe to slice flying donuts and avoid the bombs. Every slice paints a glaze splat on the background. | Donuts, Splat Pack |
+
+More are on the way. [`CATALOG.md`](CATALOG.md) has a game idea for every pack in the bundle, and [`PLAN.md`](PLAN.md) tracks what's being built.
+
+## Quick start
+
+You need:
+- **Node 22.5 or newer.** The build uses `fs.globSync` and `path.matchesGlob`.
+- **The Kenney All-in-1 asset bundle (v3.7.0)**, unzipped next to this repo as `../Kenney Game Assets All-in-1 3.7.0`. Set `KENNEY_ROOT` to use another location. The assets aren't committed here.
 
 ```sh
 npm install
-npm run dev        # http://localhost:5173 — launcher + every game
+npm run dev        # http://localhost:5173: the launcher and every game
 npm run build      # typecheck, then build to dist/
 npm run preview    # serve dist/
 ```
 
-The assets are read straight from `../Kenney Game Assets All-in-1 3.7.0`. Set `KENNEY_ROOT` to use another location.
+## How it works
 
-## Layout
+It's one Vite + TypeScript project. Each game is its own page and mostly uses [Phaser 4](https://phaser.io). The launcher at the root finds the games automatically.
 
 ```
 build/            Vite-side code: the Kenney asset plugin and game discovery
@@ -26,33 +46,43 @@ games/<id>/       One folder per game
   game.json         Title, description, thumbnail, asset globs
   index.html        Page entry
   src/
+deploy/           deploy.sh, which ships a build to the server
+docs/screenshots/ Images for this README
 ```
-
-## Adding a game
-
-1. Create `games/<id>/` with `index.html`, `src/main.ts` and `game.json`.
-2. In `main.ts`, call `await setupGamePage()` and then start your game, for example with `createGame()` from `@shared/phaser`.
-3. Load assets with `kenney('<path inside the bundle>')`, and list every file you use as a glob in `game.json` under `"assets"`.
-
-New games are picked up automatically by the launcher and as a build entry. You don't need to edit any config.
 
 ### Assets
 
-During dev, any bundle file is served under `/kenney/…`. If a game loads a file that no `game.json` declares, the terminal shows a warning. The build copies only the declared files, and it fails if a glob matches nothing, so a missing declaration shows up before you ship.
+The asset bundle has about 91,000 files, so nothing is copied into the repo:
+- **In dev**, a small Vite plugin serves any bundle file under `/kenney/…`.
+- **In the build**, only the files each game lists in its `game.json` `"assets"` globs are copied.
+- **Missing assets are caught early.** The build fails if a glob matches nothing. Dev warns when a game loads a file it hasn't declared, so a missing declaration shows up before you ship.
 
-Phaser is split into its own chunk, so the browser downloads it once for all games. For 3D games, add `three` and load the `.glb` models from the 3D kits the same way.
+### Adding a game
+
+1. Create `games/<id>/` with `index.html`, `src/main.ts` and `game.json`.
+2. In `main.ts`, call `await setupGamePage()`, then start the game, for example with `createGame()` or `createFixedGame()` from `@shared/phaser`.
+3. Load files with `kenney('<path inside the bundle>')`, and list each one as a glob in `game.json`.
+
+The launcher and the build pick up new games automatically. The checklist and conventions (play-testing, phone support, commits) are in [`PLAN.md`](PLAN.md).
 
 ## Deploying
-
-Live at **https://toys.projectz.co.nz**.
 
 ```sh
 deploy/deploy.sh
 ```
 
-This builds a clean export of the committed `HEAD` locally (CI can't, because the Kenney bundle only exists on this machine). It rsyncs the result to `home-server` over Tailscale as `/var/www/kenney-toys/releases/<ts>-<sha>` and atomically swaps the `current` symlink. Commit before deploying, since uncommitted changes don't ship. The last 5 releases are kept. To roll back, point `current` at an older release.
+The script builds a clean export of the committed `HEAD` locally, because CI doesn't have the asset bundle. It copies the build to the server over Tailscale as a timestamped release in `/var/www/kenney-toys/releases/`, then swaps the `current` link to it in one step. Uncommitted changes never ship. The last five releases are kept, so you can roll back by pointing `current` at an older one.
 
-How requests reach it, all one-time setup that's already done:
-- Cloudflare DNS: `toys.projectz.co.nz` is a proxied CNAME to the `home-web-platform` Cloudflare Tunnel.
-- The tunnel's ingress rule (`/etc/cloudflared/config.yml`) sends it to Caddy on `127.0.0.1:80`.
-- Caddy's `http://toys.projectz.co.nz` site (`/etc/caddy/Caddyfile`) serves `/var/www/kenney-toys/current` as static files. Hashed `/assets/*` are cached as immutable.
+Requests reach the site like this, all one-time setup that's already done:
+1. **Cloudflare DNS:** `toys.projectz.co.nz` is a proxied CNAME to the `home-web-platform` Cloudflare Tunnel.
+2. **Tunnel:** the ingress rule in `/etc/cloudflared/config.yml` sends it to Caddy on `127.0.0.1:80`.
+3. **Caddy:** the site in `/etc/caddy/Caddyfile` serves `/var/www/kenney-toys/current` as static files. Hashed `/assets/*` files are cached as immutable.
+
+## Credits
+
+- **Art, sound and fonts:** [Kenney](https://kenney.nl), released under [CC0](https://creativecommons.org/publicdomain/zero/1.0/). Each game's `game.json` lists the packs it uses.
+- **Built with:** [Phaser](https://phaser.io), [Vite](https://vite.dev) and [TypeScript](https://www.typescriptlang.org).
+
+## License
+
+The Kenney assets are CC0 (public domain). The code in this repository doesn't have a license yet.
