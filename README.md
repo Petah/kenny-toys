@@ -41,3 +41,18 @@ New games are picked up automatically by the launcher and as a build entry. You 
 During dev, any bundle file is served under `/kenney/…`. If a game loads a file that no `game.json` declares, the terminal shows a warning. The build copies only the declared files, and it fails if a glob matches nothing, so a missing declaration shows up before you ship.
 
 Phaser is split into its own chunk, so the browser downloads it once for all games. For 3D games, add `three` and load the `.glb` models from the 3D kits the same way.
+
+## Deploying
+
+Live at **https://toys.projectz.co.nz**.
+
+```sh
+deploy/deploy.sh
+```
+
+This builds a clean export of the committed `HEAD` locally (CI can't, because the Kenney bundle only exists on this machine). It rsyncs the result to `home-server` over Tailscale as `/var/www/kenney-toys/releases/<ts>-<sha>` and atomically swaps the `current` symlink. Commit before deploying, since uncommitted changes don't ship. The last 5 releases are kept. To roll back, point `current` at an older release.
+
+How requests reach it, all one-time setup that's already done:
+- Cloudflare DNS: `toys.projectz.co.nz` is a proxied CNAME to the `home-web-platform` Cloudflare Tunnel.
+- The tunnel's ingress rule (`/etc/cloudflared/config.yml`) sends it to Caddy on `127.0.0.1:80`.
+- Caddy's `http://toys.projectz.co.nz` site (`/etc/caddy/Caddyfile`) serves `/var/www/kenney-toys/current` as static files. Hashed `/assets/*` are cached as immutable.
