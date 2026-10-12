@@ -13,6 +13,7 @@ Small, instantly fun browser games, each built around one [Kenney](https://kenne
 | <img src="docs/screenshots/monster-maker.webp" width="240" alt="Monster Maker"> | **[Monster Maker](https://toys.projectz.co.nz/games/monster-maker/)**<br>Build a monster from parts, stick googly eyes on it that follow your cursor, make it dance and save it as a PNG. | Monster Builder Pack, Googly Eyes |
 | <img src="docs/screenshots/duck-shoot.webp" width="240" alt="Duck Shoot"> | **[Duck Shoot](https://toys.projectz.co.nz/games/duck-shoot/)**<br>Fairground shooting gallery. Pop ducks and bullseyes before the minute's up, and don't forget to reload. | Shooting Gallery |
 | <img src="docs/screenshots/donut-splat.webp" width="240" alt="Donut Splat"> | **[Donut Splat](https://toys.projectz.co.nz/games/donut-splat/)**<br>Swipe to slice flying donuts and avoid the bombs. Every slice paints a glaze splat on the background. | Donuts, Splat Pack |
+| <img src="docs/screenshots/tappy-plane.webp" width="240" alt="Tappy Plane"> | **[Tappy Plane](https://toys.projectz.co.nz/games/tappy-plane/)**<br>Flappy Bird with a propeller plane. Tap through the rock gaps and earn bronze, silver and gold medals. | Tappy Plane |
 
 More are on the way. [`CATALOG.md`](CATALOG.md) has a game idea for every pack in the bundle, and [`PLAN.md`](PLAN.md) tracks what's being built.
 
