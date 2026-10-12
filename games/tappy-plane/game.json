@@ -1,0 +1,17 @@
+{
+  "title": "Tappy Plane",
+  "description": "Tap to keep a little biplane aloft and thread it between rock spikes. Every gap is a point; earn a bronze, silver or gold medal.",
+  "thumbnail": "2D assets/Tappy Plane/Sample.png",
+  "assets": [
+    "2D assets/Tappy Plane/Spritesheet/sheet.*",
+    "Audio/Foley Sounds/Audio/Woosh/woosh{1,4,5,6}.ogg",
+    "Audio/Retro Sounds 2/Audio/coin{1,4}.ogg",
+    "Audio/Foley Sounds/Audio/Rocks/stonesHit{1,2}.ogg",
+    "Audio/Impact Sounds/Audio/impactPunch_heavy_00[0-2].ogg",
+    "Audio/Retro Sounds 2/Audio/fall{1,2}.ogg",
+    "Audio/Interface Sounds/Audio/tick_00{1,2}.ogg",
+    "Audio/Music Jingles/Audio (Pizzicato)/jingles-pizzicato_{01,05}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{go,game_over,new_highscore}.ogg",
+    "Audio/Music Loops/Loops/Farm Frolics.ogg"
+  ]
+}

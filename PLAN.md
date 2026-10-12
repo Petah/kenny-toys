@@ -43,7 +43,7 @@ Status: ✅ done · 🚧 in progress · ⬜ idea
 | ✅ | Monster Maker | Monster Builder, Googly Eyes | Build a monster from parts. Googly eyes follow the cursor, plus randomise, dance and PNG export. |
 | ✅ | Duck Shoot | Shooting Gallery, Voiceover, Desert Shooter sounds | Fairground gallery: ducks and targets glide on rows, 60s timer, ammo and reload, ring scoring. |
 | ✅ | Donut Splat | Donuts, Splat Pack | Fruit Ninja with donuts. Swipes leave paint splats. |
-| ⬜ | Tappy Plane | Tappy Plane | Flappy Bird. The pack ships the GET READY / GAME OVER art. |
+| ✅ | Tappy Plane | Tappy Plane, Foley + Retro sounds, Voiceover | Flappy Bird through rock spikes: random plane and terrain each round, puff trails, medals on the GAME OVER card. |
 | ⬜ | Topple | Physics Assets | Angry Birds-style knock-the-blocks-down physics. |
 | ⬜ | Tilt Maze | Rolling Ball Assets | Tilt a board (device tilt or arrows) to roll a ball to the goal. |
 | ⬜ | Fish Frenzy | Fish Pack | Eat smaller fish, grow, avoid bigger ones. |
