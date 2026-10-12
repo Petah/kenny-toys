@@ -14,6 +14,7 @@ Small, instantly fun browser games, each built around one [Kenney](https://kenne
 | <img src="docs/screenshots/duck-shoot.webp" width="240" alt="Duck Shoot"> | **[Duck Shoot](https://toys.projectz.co.nz/games/duck-shoot/)**<br>Fairground shooting gallery. Pop ducks and bullseyes before the minute's up, and don't forget to reload. | Shooting Gallery |
 | <img src="docs/screenshots/donut-splat.webp" width="240" alt="Donut Splat"> | **[Donut Splat](https://toys.projectz.co.nz/games/donut-splat/)**<br>Swipe to slice flying donuts and avoid the bombs. Every slice paints a glaze splat on the background. | Donuts, Splat Pack |
 | <img src="docs/screenshots/tappy-plane.webp" width="240" alt="Tappy Plane"> | **[Tappy Plane](https://toys.projectz.co.nz/games/tappy-plane/)**<br>Flappy Bird with a propeller plane. Tap through the rock gaps and earn bronze, silver and gold medals. | Tappy Plane |
+| <img src="docs/screenshots/topple.webp" width="240" alt="Topple"> | **[Topple](https://toys.projectz.co.nz/games/topple/)**<br>Angry Birds-style physics. Sling boulders and bombs at glass, wood, stone and TNT forts across eight levels. | Physics Assets |
 
 More are on the way. [`CATALOG.md`](CATALOG.md) has a game idea for every pack in the bundle, and [`PLAN.md`](PLAN.md) tracks what's being built.
 
