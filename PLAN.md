@@ -32,6 +32,8 @@ The asset bundle lives next to this repo at `../Kenney Game Assets All-in-1 3.7.
 
 ## Backlog
 
+`CATALOG.md` has a one-line game idea for every pack in the bundle. This backlog is the shortlist being worked through.
+
 Status: ✅ done · 🚧 in progress · ⬜ idea
 
 ### 2D
