@@ -1,0 +1,17 @@
+{
+  "title": "Donut Splat",
+  "description": "Swipe to slice flying donuts into glaze splats, and steer clear of the bombs. Every splat paints the background.",
+  "thumbnail": "2D assets/Donuts/Sample.png",
+  "assets": [
+    "2D assets/Donuts/Spritesheet/*",
+    "2D assets/Splat Pack/PNG/Default (256px)/*.png",
+    "2D assets/New Platformer Pack/Sprites/Tiles/Double/{bomb,bomb_active}.png",
+    "2D assets/Explosion Pack/Spritesheets/spritesheet_regularExplosion.*",
+    "2D assets/Particle Pack/PNG (Transparent)/circle_05.png",
+    "Audio/RPG Audio/Audio/{knifeSlice,knifeSlice2,cloth1,cloth2,cloth3,cloth4}.ogg",
+    "Audio/Impact Sounds/Audio/impactSoft_heavy_00[0-4].ogg",
+    "2D assets/Desert Shooter Pack/Sounds/{explosion-a,explosion-b,coin-a,coin-c,hurt-a}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{game_over,new_highscore}.ogg",
+    "Audio/Music Loops/Loops/Wacky Waiting.ogg"
+  ]
+}
