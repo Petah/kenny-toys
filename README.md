@@ -18,7 +18,8 @@ build/            Vite-side code: the Kenney asset plugin and game discovery
 shared/           Runtime code every game can use
   kenney.ts         kenney('2D assets/…/file.png') → URL for a bundle file
   shell.ts          setupGamePage(): theme, Kenney fonts, back-to-launcher link
-  phaser.ts         createGame() (fills its parent, resizes) and sfx helpers
+  phaser.ts         createGame() (fills parent) / createFixedGame() (letterboxed), sfx helpers
+  storage.ts        Guarded localStorage and high scores
   theme.css         Colours, buttons, fonts
 launcher/         The root index page
 games/<id>/       One folder per game

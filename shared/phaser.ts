@@ -29,3 +29,11 @@ export function playSfx(scene: Phaser.Scene, groups: SfxGroups, name: string, co
   const key = `sfx:${name}:${Phaser.Math.Between(0, variants.length - 1)}`;
   scene.sound.play(key, { detune: Phaser.Math.Between(-150, 150), volume: 0.6, ...config });
 }
+
+/** A game with a fixed design resolution, letterboxed to fit its parent. For arcade-style layouts. */
+export function createFixedGame(parent: HTMLElement, scenes: Phaser.Types.Scenes.SceneType[], width: number, height: number, extra: Phaser.Types.Core.GameConfig = {}) {
+  return createGame(parent, scenes, {
+    scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH, width, height },
+    ...extra,
+  });
+}
