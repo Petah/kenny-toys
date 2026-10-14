@@ -45,7 +45,7 @@ Status: ✅ done · 🚧 in progress · ⬜ idea
 | ✅ | Donut Splat | Donuts, Splat Pack | Fruit Ninja with donuts. Swipes leave paint splats. |
 | ✅ | Tappy Plane | Tappy Plane, Foley + Retro sounds, Voiceover | Flappy Bird through rock spikes: random plane and terrain each round, puff trails, medals on the GAME OVER card. |
 | ✅ | Topple | Physics Assets, Explosion Pack, Impact Sounds | Angry Birds-style slingshot: 8 levels of wood, glass, stone and TNT towers with aliens to knock off, stars per level. |
-| ⬜ | Tilt Maze | Rolling Ball Assets | Tilt a board (device tilt or arrows) to roll a ball to the goal. |
+| ✅ | Tilt Maze | Rolling Ball Assets | Tilt a board (phone tilt, arrows or drag) to roll a ball home: 10 levels of holes, keys and locked blocks, spinners and lasers, 3 stars each. Portrait screens play each level mirrored on its diagonal. `games/tilt-maze/scripts/check-levels.ts` checks every level can be finished. |
 | ⬜ | Fish Frenzy | Fish Pack | Eat smaller fish, grow, avoid bigger ones. |
 | ⬜ | Abduction | Alien UFO Pack | Tractor-beam cows before the timer ends. |
 | ⬜ | Slingshot | Planets | Launch a probe around gravity wells to a target. |

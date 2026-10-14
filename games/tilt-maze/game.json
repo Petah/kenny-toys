@@ -1,0 +1,17 @@
+{
+  "title": "Tilt Maze",
+  "description": "Tilt the board to roll the ball home. Dodge the holes, grab the key, time the spinners and lasers, and collect three stars a level. Tilt your phone, use the arrow keys or drag.",
+  "thumbnail": "2D assets/Rolling Ball Assets/Sample.png",
+  "assets": [
+    "2D assets/Rolling Ball Assets/Spritesheet/rollingBall_sheet.{png,xml}",
+    "2D assets/Particle Pack/PNG (Transparent)/star_06.png",
+    "Audio/Impact Sounds/Audio/impactPlate_light_00[0-4].ogg",
+    "Audio/Retro Sounds 2/Audio/{fall1,fall2,fall3,coin1,coin2,coin3,secret1}.ogg",
+    "Audio/Digital Audio/Audio/{phaseJump1,zap1,zap2,threeTone1}.ogg",
+    "Audio/Sci-Fi Sounds/Audio/{doorOpen_000,forceField_000}.ogg",
+    "Audio/Interface Sounds/Audio/{click_001,click_002,error_004}.ogg",
+    "Audio/Music Jingles/Audio (Hit)/jingles-hit_{00,04}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{level,[1-9],10,you_win,congratulations,new_highscore}.ogg",
+    "Audio/Music Loops/Loops/Flowing Rocks.ogg"
+  ]
+}

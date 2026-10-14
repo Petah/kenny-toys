@@ -16,6 +16,7 @@ Small, instantly fun browser games, each built around one [Kenney](https://kenne
 | <img src="docs/screenshots/tappy-plane.webp" width="240" alt="Tappy Plane"> | **[Tappy Plane](https://toys.projectz.co.nz/games/tappy-plane/)**<br>Flappy Bird with a propeller plane. Tap through the rock gaps and earn bronze, silver and gold medals. | Tappy Plane |
 | <img src="docs/screenshots/topple.webp" width="240" alt="Topple"> | **[Topple](https://toys.projectz.co.nz/games/topple/)**<br>Angry Birds-style physics. Sling boulders and bombs at glass, wood, stone and TNT forts across eight levels. | Physics Assets |
 | <img src="docs/screenshots/sokoban.webp" width="240" alt="Sokoban"> | **[Sokoban](https://toys.projectz.co.nz/games/sokoban/)**<br>Push every crate onto its spot across twelve warehouse puzzles, some with colour-matched crates. Unlimited undo, and coins for matching par. | Sokoban Pack |
+| <img src="docs/screenshots/tilt-maze.webp" width="240" alt="Tilt Maze"> | **[Tilt Maze](https://toys.projectz.co.nz/games/tilt-maze/)**<br>Tilt the board to roll a ball home past holes, spinners and lasers, with a key to find and three stars per level. Tilt your phone, use the arrow keys or drag. | Rolling Ball Assets |
 
 More are on the way. [`CATALOG.md`](CATALOG.md) has a game idea for every pack in the bundle, and [`PLAN.md`](PLAN.md) tracks what's being built.
 

@@ -92,7 +92,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Road Textures / Classic | **Road Builder**: lay road tiles and drive a car along them. |
 | | Robot Pack | **Robot Factory**: assemble robots from parts on a conveyor. |
 | | Roguelike Base / Characters / City / Dungeon / Interior | **Rogue Town**: tiny turn-based roguelike from town into a dungeon. |
-| 🎯 | Rolling Ball Assets | **Tilt Maze**: tilt the board to roll the ball into the goal. |
+| ✅ | Rolling Ball Assets | Used in **Tilt Maze**: tilt the board to roll the ball into the goal. |
 | | RPG Tiles Vector | **Village Walk**: top-down RPG village with NPC chats. |
 | | RPG Urban Pack | **City Errands**: top-down pixel errands in a town. |
 | | RTS Medieval / (Pixel) / Sci-fi | **Mini RTS**: gather, build and send units in a single-screen skirmish. |
