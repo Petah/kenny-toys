@@ -1,0 +1,15 @@
+{
+  "title": "Minigolf",
+  "description": "Nine holes of minigolf floating on a pond: castles, a windmill, ramps, bumps and a gap to clear. Drag back from the ball to putt, or use the arrow keys and space.",
+  "thumbnail": "3D assets/Minigolf Kit/Sample.png",
+  "assets": [
+    "3D assets/Minigolf Kit/Models/GLB format/{ball-red,bump,bump-walls,castle,club-red,corner,crest,end,flag-red,gap,hill-round,hole-open,hole-round,narrow-block,narrow-round,obstacle-block,obstacle-diamond,open,ramp,ramp-low,ramp-medium,round-corner-a,side,split-t,start,straight,support,support-low,tunnel-wide,walls-to-open,windmill}.glb",
+    "3D assets/Minigolf Kit/Models/GLB format/Textures/colormap.png",
+    "Audio/Impact Sounds/Audio/{impactMetal_light,impactWood_light,impactTin_medium}_00[0-4].ogg",
+    "Audio/Foley Sounds/Audio/Water/sinkWater[1-4].ogg",
+    "Audio/Interface Sounds/Audio/{click_001,click_002}.ogg",
+    "Audio/Music Jingles/Audio (Saxophone)/jingles-saxophone_{00,02,05}.ogg",
+    "Audio/Voiceover Pack/Audio (Male)/{congratulations,new_highscore}.ogg",
+    "Audio/Music Loops/Loops/Swinging Pants.ogg"
+  ]
+}

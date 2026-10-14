@@ -17,6 +17,7 @@ Small, instantly fun browser games, each built around one [Kenney](https://kenne
 | <img src="docs/screenshots/topple.webp" width="240" alt="Topple"> | **[Topple](https://toys.projectz.co.nz/games/topple/)**<br>Angry Birds-style physics. Sling boulders and bombs at glass, wood, stone and TNT forts across eight levels. | Physics Assets |
 | <img src="docs/screenshots/sokoban.webp" width="240" alt="Sokoban"> | **[Sokoban](https://toys.projectz.co.nz/games/sokoban/)**<br>Push every crate onto its spot across twelve warehouse puzzles, some with colour-matched crates. Unlimited undo, and coins for matching par. | Sokoban Pack |
 | <img src="docs/screenshots/tilt-maze.webp" width="240" alt="Tilt Maze"> | **[Tilt Maze](https://toys.projectz.co.nz/games/tilt-maze/)**<br>Tilt the board to roll a ball home past holes, spinners and lasers, with a key to find and three stars per level. Tilt your phone, use the arrow keys or drag. | Rolling Ball Assets |
+| <img src="docs/screenshots/minigolf.webp" width="240" alt="Minigolf"> | **[Minigolf](https://toys.projectz.co.nz/games/minigolf/)**<br>Nine 3D holes floating on a pond, with castles, a windmill, ramps, bumps and a gap to clear. Drag back from the ball to putt, and mind the water. | Minigolf Kit |
 
 More are on the way. [`CATALOG.md`](CATALOG.md) has a game idea for every pack in the bundle, and [`PLAN.md`](PLAN.md) tracks what's being built.
 
@@ -35,7 +36,7 @@ npm run preview    # serve dist/
 
 ## How it works
 
-It's one Vite + TypeScript project. Each game is its own page and mostly uses [Phaser 4](https://phaser.io). The launcher at the root finds the games automatically.
+It's one Vite + TypeScript project. Each game is its own page. The 2D games use [Phaser 4](https://phaser.io), and the 3D ones use [three.js](https://threejs.org) with [Rapier](https://rapier.rs) for physics. The launcher at the root finds the games automatically.
 
 ```
 build/            Vite-side code: the Kenney asset plugin and game discovery
@@ -85,7 +86,7 @@ Requests reach the site like this, all one-time setup that's already done:
 ## Credits
 
 - **Art, sound and fonts:** [Kenney](https://kenney.nl), released under [CC0](https://creativecommons.org/publicdomain/zero/1.0/). Each game's `game.json` lists the packs it uses.
-- **Built with:** [Phaser](https://phaser.io), [Vite](https://vite.dev) and [TypeScript](https://www.typescriptlang.org).
+- **Built with:** [Phaser](https://phaser.io), [three.js](https://threejs.org), [Rapier](https://rapier.rs), [Vite](https://vite.dev) and [TypeScript](https://www.typescriptlang.org).
 
 ## License
 

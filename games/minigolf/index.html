@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:," />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Minigolf</title>
+    <style>
+      html:root { --bg: #a8dcf0; --ink: #ffffff; --shade: #23505f; --gold: #ffe27a; }
+      body { overflow: hidden; }
+      #stage { position: fixed; inset: 0; touch-action: none; }
+      .hud { position: fixed; z-index: 4; pointer-events: none; color: var(--ink); font-family: 'Kenney Bold', sans-serif;
+        text-shadow: 0 3px 0 var(--shade), 0 -2px 0 var(--shade), 2px 0 0 var(--shade), -2px 0 0 var(--shade); }
+      #top { top: 10px; left: 50%; transform: translateX(-50%); text-align: center; white-space: nowrap; }
+      #hole { font-size: clamp(22px, 4.5vw, 34px); }
+      #sub { font-size: clamp(14px, 2.6vw, 19px); color: var(--gold); margin-top: 2px; }
+      #score { top: 64px; right: 14px; text-align: right; font-size: clamp(16px, 3vw, 22px); }
+      #hint { bottom: 82px; left: 50%; transform: translateX(-50%); font-size: clamp(14px, 2.6vw, 19px); color: var(--gold);
+        text-align: center; width: min(92vw, 640px); transition: opacity 0.5s; }
+      #banner { top: 38%; left: 50%; transform: translate(-50%, -50%) scale(0.4); font-size: clamp(40px, 10vw, 88px); opacity: 0;
+        transition: transform 0.35s cubic-bezier(.2,1.6,.4,1), opacity 0.25s; white-space: nowrap; }
+      #banner.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      #banner small { display: block; font-size: 0.36em; color: var(--gold); text-align: center; }
+      #buttons { position: fixed; z-index: 5; bottom: 14px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; }
+      #buttons .btn, .card .btn { font-size: 17px; }
+      .card { position: fixed; z-index: 6; inset: 0; display: none; place-items: center; background: rgba(20, 50, 64, 0.45); }
+      .card.show { display: grid; }
+      .card > div { background: #2f7f9f; border: 4px solid rgba(255,255,255,0.4); border-radius: 22px; padding: 22px 20px 18px;
+        color: #fff; font-family: 'Kenney Bold', sans-serif; text-align: center; max-width: 94vw; box-shadow: 0 10px 0 rgba(0,0,0,0.25); }
+      .card h2 { margin: 0 0 12px; font-size: clamp(28px, 6vw, 44px); font-weight: normal; }
+      .card table { border-collapse: collapse; margin: 0 auto 14px; font-size: clamp(12px, 2.6vw, 17px); }
+      .card td, .card th { padding: 4px 6px; border-bottom: 1px solid rgba(255,255,255,0.2); font-weight: normal; }
+      .card th { color: var(--gold); text-align: left; }
+      .card .under { color: #b8ffcf; } .card .over { color: #ffc9c9; }
+      .card p { margin: 0 0 14px; color: var(--gold); }
+      #title h1 { margin: 0; font-size: clamp(46px, 11vw, 96px); font-weight: normal; line-height: 1; }
+      #title > div { background: none; border: none; box-shadow: none; text-shadow: 0 5px 0 var(--shade), 0 -3px 0 var(--shade), 3px 0 0 var(--shade), -3px 0 0 var(--shade); }
+      #title .btn { font-size: 24px; padding: 14px 34px; text-shadow: none; }
+      #title { background: none; }
+      /* Narrow screens: clear the "All toys" link and keep the buttons compact. */
+      @media (max-width: 700px) {
+        #top { top: 58px; }
+        #score { top: 118px; }
+        #buttons .btn { font-size: 14px; padding: 8px 12px; }
+        #hint { bottom: 64px; }
+      }
+      body.on-title .hud, body.on-title #buttons { display: none; }
+    </style>
+  </head>
+  <body>
+    <div id="stage"></div>
+    <div id="top" class="hud"><div id="hole"></div><div id="sub"></div></div>
+    <div id="score" class="hud"></div>
+    <div id="hint" class="hud"></div>
+    <div id="banner" class="hud"></div>
+    <div id="buttons"><button id="btn-card" class="btn">Scorecard</button><button id="btn-replay" class="btn">Restart hole</button></div>
+    <div id="card" class="card"><div><h2 id="card-title">Scorecard</h2><table id="card-table"></table><p id="card-note"></p><button id="card-go" class="btn">Close</button></div></div>
+    <div id="title" class="card show"><div><h1>MINIGOLF</h1><p id="title-best">nine holes on the pond</p><button id="title-play" class="btn">Play</button></div></div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

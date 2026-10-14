@@ -154,7 +154,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Mini Forest | **Camp Out**: set up a campsite in a tiny forest. |
 | | Mini Market | **Checkout**: scan shoppers' items fast at a mini market till. |
 | | Mini Skate | **Skate Park**: trick combos on ramps. |
-| 🎯 | Minigolf Kit | **Minigolf**: 9 holes, click-drag to putt. |
+| ✅ | Minigolf Kit | Used in **Minigolf**: 9 holes, click-drag to putt. |
 | | Modular Buildings | **Street Builder**: assemble building façades along a street. |
 | | Modular Cave / Dungeon / Space Kit | **Maze Explorer**: first-person procedural maze from modular rooms. |
 | | Nature Kit (+ Classic) | **Island Walk**: wander a procedurally placed nature island. |
