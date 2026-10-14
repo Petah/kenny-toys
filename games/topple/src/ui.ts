@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser';
 import { FONT_HEADING } from '@shared/fonts';
 import { playSfx } from '@shared/phaser';
+import { makeButton as sharedButton, type ButtonOptions } from '@shared/ui';
 import { SFX } from './assets';
 import type { Level } from './levels';
 
@@ -37,55 +38,9 @@ export function drawBackdrop(scene: Phaser.Scene, backdrop: Level['backdrop']) {
   return ground;
 }
 
-export interface Button {
-  zone: Phaser.GameObjects.Zone;
-  parts: Phaser.GameObjects.GameObject[];
-}
-
-/** A chunky rounded button. Returns its parts so callers can put them in an overlay container. */
-export function makeButton(
-  scene: Phaser.Scene,
-  x: number,
-  y: number,
-  label: string,
-  onClick: () => void,
-  opts: { w?: number; h?: number; color?: number; size?: number; disabled?: boolean } = {},
-): Button {
-  const w = opts.w ?? 200;
-  const h = opts.h ?? 76;
-  const color = opts.color ?? 0x3aa55c;
-  const g = scene.add.graphics();
-  const draw = (pressed: boolean) => {
-    g.clear();
-    g.fillStyle(0x000000, 0.3).fillRoundedRect(x - w / 2, y - h / 2 + 6, w, h, 18);
-    g.fillStyle(opts.disabled ? 0x7a8a94 : color).fillRoundedRect(x - w / 2, y - h / 2 + (pressed ? 4 : 0), w, h, 18);
-    g.lineStyle(4, 0xffffff, 0.35).strokeRoundedRect(x - w / 2 + 3, y - h / 2 + 3 + (pressed ? 4 : 0), w - 6, h - 6, 15);
-  };
-  draw(false);
-  const text = scene.add
-    .text(x, y, label, { ...TEXT, fontSize: `${opts.size ?? 34}px`, strokeThickness: 6, stroke: '#1d3b4c' })
-    .setOrigin(0.5)
-    .setAlpha(opts.disabled ? 0.6 : 1);
-  const zone = scene.add.zone(x, y, w, h);
-  if (!opts.disabled) {
-    zone.setInteractive({ useHandCursor: true });
-    zone.on('pointerdown', (_p: Phaser.Input.Pointer, _x: number, _y: number, e: Phaser.Types.Input.EventData) => {
-      e.stopPropagation();
-      draw(true);
-      text.y = y + 4;
-    });
-    zone.on('pointerout', () => {
-      draw(false);
-      text.y = y;
-    });
-    zone.on('pointerup', () => {
-      draw(false);
-      text.y = y;
-      playSfx(scene, SFX, 'click');
-      onClick();
-    });
-  }
-  return { zone, parts: [g, text, zone] };
+/** The shared button in Topple's lettering, with a click on every press. */
+export function makeButton(scene: Phaser.Scene, x: number, y: number, label: string, onClick: () => void, opts: Omit<ButtonOptions, 'textStyle'> = {}) {
+  return sharedButton(scene, x, y, label, onClick, { textStyle: TEXT, onPress: () => playSfx(scene, SFX, 'click'), ...opts });
 }
 
 /** Three stars in a row, gold for earned ones. */
