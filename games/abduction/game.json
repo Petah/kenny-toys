@@ -1,0 +1,19 @@
+{
+  "title": "Abduction",
+  "description": "Fly a UFO over a farm at night and tractor-beam the animals aboard before time runs out. Fill the mothership's wanted list for extra time, and whatever you do, don't beam up the bull.",
+  "thumbnail": "2D assets/Alien UFO Pack/Sample.png",
+  "assets": [
+    "2D assets/Alien UFO Pack/Spritesheets/spritesheet_{spaceships,lasers}.{png,xml}",
+    "2D assets/Animal Pack Remastered/Spritesheet/round.{png,xml}",
+    "2D assets/Background Elements Remastered/Spritesheet/spritesheet_default.{png,xml}",
+    "2D assets/Background Elements Remastered/Backgrounds/Elements/{hills,hillsLarge,groundLayer1,cloudLayer1}.png",
+    "Audio/Sci-Fi Sounds/Audio/{forceField_000,spaceEngineLow_000,impactMetal_000,impactMetal_002}.ogg",
+    "Audio/Digital Audio/Audio/phaserUp{1,2,3}.ogg",
+    "Audio/Impact Sounds/Audio/impactSoft_medium_00[0-2].ogg",
+    "Audio/Impact Sounds/Audio/impactMetal_heavy_000.ogg",
+    "Audio/Interface Sounds/Audio/{click_001,click_002,tick_001,tick_002,confirmation_001}.ogg",
+    "Audio/Music Jingles/Audio (Retro)/jingles-retro_{04,10}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{go,hurry_up,time_over,new_highscore}.ogg",
+    "Audio/Music Loops/Loops/Space Cadet.ogg"
+  ]
+}

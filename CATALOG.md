@@ -11,7 +11,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | 1-Bit Pack | **Tiny Roguelike**: bump-to-attack dungeon crawl in crisp 1-bit tiles. |
 | | 1-Bit Platformer Pack | **Mono Jump**: single-screen 1-bit platformer, collect all keys to open the door. |
 | | Abstract Platformer | **Blob Hop**: one-button auto-runner across abstract geometric platforms. |
-| 🎯 | Alien UFO Pack | **Abduction**: beam up cows and people with a tractor beam before time runs out. |
+| ✅ | Alien UFO Pack (+ Animal Pack Remastered) | **Abduction**: beam up farm animals with a tractor beam before time runs out. |
 | | Animal Pack / Remastered | **Animal Stack**: drop square animals on each other into a tower that mustn't topple. |
 | | Axonometric Blocks | **Block Builder**: drag-and-drop axonometric block sandbox, Minecraft in miniature. |
 | | Background Elements / Remastered | **Parallax Painter**: build a layered parallax scene and scroll through it. |
@@ -27,7 +27,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | ✅ | Donuts (+ Splat Pack) | **Donut Splat**: Fruit Ninja with donuts; slices paint glaze splats. |
 | | Emote Pack | **Emote Match**: match-3 with speech-bubble emotes. |
 | | Explosion Pack | *(effects)*: explosion flipbooks for any game; toy idea: **Boom Box** click-to-detonate. |
-| | Fish Pack | **Fish Frenzy**: eat smaller fish to grow, avoid bigger ones. |
+| ✅ | Fish Pack | **Fish Frenzy**: eat smaller fish to grow, avoid bigger ones. |
 | | Flag Pack | **Flag Quiz**: guess the country from its flag, against the clock. |
 | | Foliage Pack / Foliage Sprites | **Garden Doodle**: stamp plants and bushes into a little garden scene. |
 | | Generic Items | **Spot the Item**: hidden-object search through a cluttered pile of items. |

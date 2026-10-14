@@ -47,7 +47,7 @@ Status: ✅ done · 🚧 in progress · ⬜ idea
 | ✅ | Topple | Physics Assets, Explosion Pack, Impact Sounds | Angry Birds-style slingshot: 8 levels of wood, glass, stone and TNT towers with aliens to knock off, stars per level. |
 | ✅ | Tilt Maze | Rolling Ball Assets | Tilt a board (phone tilt, arrows or drag) to roll a ball home: 10 levels of holes, keys and locked blocks, spinners and lasers, 3 stars each. Portrait screens play each level mirrored on its diagonal. `games/tilt-maze/scripts/check-levels.ts` checks every level can be finished. |
 | ✅ | Fish Frenzy | Fish Pack, Interface + Retro sounds, Steeldrum jingles, Voiceover | Eat smaller fish to grow through four sizes (pink, green, blue, red), each unlocking the next fish as food. Bigger fish chase you, pufferfish puff up and eels dash in after a warning. Three lives, combos for quick bites, and a full growth bar clears the wave and shrinks you back for a busier one. |
-| ⬜ | Abduction | Alien UFO Pack | Tractor-beam cows before the timer ends. |
+| ✅ | Abduction | Alien UFO Pack, Animal Pack Remastered, Background Elements Remastered, Sci-Fi + Digital sounds | A 60s round over a farm at night: hold to beam animals up (Matter physics; heavy ones rise slower, and they scatter from the beam). A WANTED list adds time when filled, a little less each order. Beaming the bull gets the ship rammed: dents and -5s. |
 | ⬜ | Slingshot | Planets | Launch a probe around gravity wells to a target. |
 | ⬜ | Downhill | Tiny Ski | SkiFree-style endless slope. |
 | ⬜ | Domino Chain | Domino Pack | Place dominoes, tip the first, watch the chain. |
