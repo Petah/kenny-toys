@@ -1,0 +1,16 @@
+{
+  "title": "Fish Frenzy",
+  "description": "Eat smaller fish to grow, and stay clear of bigger ones. Fill the growth bar to work up the food chain, and dodge pufferfish and eels. Follow the mouse, drag, or use the arrow keys.",
+  "thumbnail": "2D assets/Fish Pack/Sample.png",
+  "assets": [
+    "2D assets/Fish Pack/Spritesheet/spritesheet-double.{png,xml}",
+    "Audio/Interface Sounds/Audio/{drop_001,drop_002,drop_003,drop_004,pluck_001,pluck_002,click_001,click_002,tick_001,tick_002}.ogg",
+    "Audio/Retro Sounds 2/Audio/{hurt1,hurt2,upgrade1,upgrade3}.ogg",
+    "Audio/Digital Audio/Audio/{phaserUp1,lowThreeTone}.ogg",
+    "Audio/Foley Sounds/Audio/Woosh/woosh{2,3}.ogg",
+    "Audio/Foley Sounds/Audio/Water/drip{1,2,3}.ogg",
+    "Audio/Music Jingles/Audio (Steeldrum)/jingles-steel_{03,05,10}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{go,level_up,game_over,new_highscore}.ogg",
+    "Audio/Music Loops/Loops/Night at the Beach.ogg"
+  ]
+}

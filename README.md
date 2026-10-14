@@ -19,6 +19,7 @@ Small, instantly fun browser games, each built around one [Kenney](https://kenne
 | <img src="docs/screenshots/tilt-maze.webp" width="240" alt="Tilt Maze"> | **[Tilt Maze](https://toys.projectz.co.nz/games/tilt-maze/)**<br>Tilt the board to roll a ball home past holes, spinners and lasers, with a key to find and three stars per level. Tilt your phone, use the arrow keys or drag. | Rolling Ball Assets |
 | <img src="docs/screenshots/minigolf.webp" width="240" alt="Minigolf"> | **[Minigolf](https://toys.projectz.co.nz/games/minigolf/)**<br>Nine 3D holes floating on a pond, with castles, a windmill, ramps, bumps and a gap to clear. Drag back from the ball to putt, and mind the water. | Minigolf Kit |
 | <img src="docs/screenshots/marble-run.webp" width="240" alt="Marble Run"> | **[Marble Run](https://toys.projectz.co.nz/games/marble-run/)**<br>Snap track together piece by piece (drops, spirals, U-turns, bumps and wiggles), then drop a stream of marbles and watch them race down. Or hit Surprise me for a random run. | Marble Kit |
+| <img src="docs/screenshots/fish-frenzy.webp" width="240" alt="Fish Frenzy"> | **[Fish Frenzy](https://toys.projectz.co.nz/games/fish-frenzy/)**<br>Eat smaller fish to grow up the food chain, and stay clear of anything bigger, plus pufferfish and darting eels. Fill the growth bar to clear a wave. | Fish Pack |
 
 More are on the way. [`CATALOG.md`](CATALOG.md) has a game idea for every pack in the bundle, and [`PLAN.md`](PLAN.md) tracks what's being built.
 
