@@ -2,10 +2,10 @@ import * as Phaser from 'phaser';
 import { FONT_BODY, FONT_HEADING } from '@shared/fonts';
 import { playSfx } from '@shared/phaser';
 import { load, submitHighScore } from '@shared/storage';
-import { makeButton } from '@shared/ui';
+import { fitCard, makeButton } from '@shared/ui';
 import {
   PLAYER_FRAME, PLAYER_LEN, PLAYER_SKELETON, SFX, SHEET, SPECIES, STAGE_GROWTH,
-  buildStrip, frameBounds, padAtlas, preloadAssets, type Bounds, type Species, type Voice,
+  buildStrip, frameBounds, preloadAssets, unpackSheet, type Bounds, type Species, type Voice,
 } from './assets';
 import { Swimmer, bodyHit, touching, type Hit, type Water } from './fish';
 import { HudNumber } from './HudNumber';
@@ -117,7 +117,7 @@ export class OceanScene extends Phaser.Scene {
   // ---- Setup -------------------------------------------------------------------------------
 
   create() {
-    padAtlas(this);
+    unpackSheet(this);
     buildStrip(this, 'sand', ['terrain_sand_top_a', 'terrain_sand_top_b', 'terrain_sand_top_c', 'terrain_sand_top_d'], 'terrain_sand_a');
     buildStrip(this, 'hills', ['background_terrain_top'], 'background_terrain');
 
@@ -857,16 +857,6 @@ export class OceanScene extends Phaser.Scene {
     this.player.setAlpha(blinking ? 0.45 + 0.45 * Math.round((Math.sin(time / 60) + 1) / 2) : 1);
     if (speed > 220 && Math.random() < dt * 6) this.bubbles.emitParticleAt(this.px - this.facing * len * 0.45, this.py);
   }
-}
-
-/**
- * Scales a card to the UI scale, or smaller if `width` (in card units) wouldn't fit across the
- * screen. Its big title is wider than the rest, so on narrow screens that shrinks on its own.
- */
-function fitCard(card: Phaser.GameObjects.Container, k: number, screenW: number, width: number, title: Phaser.GameObjects.Text) {
-  card.setScale(Math.min(k, (screenW - 24) / width));
-  const room = (screenW - 32) / card.scale;
-  if (title.width > room) title.setScale(room / title.width);
 }
 
 function group(n: number) {

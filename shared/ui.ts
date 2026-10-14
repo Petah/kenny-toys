@@ -67,3 +67,13 @@ function iconLabel(scene: Phaser.Scene, x: number, y: number, frame: string, siz
   const icon = scene.add.image(0, 0, ICONS, frame).setScale(scale);
   return scene.add.container(x, y, [shadow, icon]);
 }
+
+/**
+ * Scales a centred card to the UI scale `k`, or smaller if `width` (in card units) wouldn't fit
+ * across the screen. Its big title is wider than the rest, so on narrow screens that shrinks on its own.
+ */
+export function fitCard(card: Phaser.GameObjects.Container, k: number, screenW: number, width: number, title: Phaser.GameObjects.Text) {
+  card.setScale(Math.min(k, (screenW - 24) / width));
+  const room = (screenW - 32) / card.scale;
+  if (title.width > room) title.setScale(room / title.width);
+}

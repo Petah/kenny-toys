@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { padAtlas } from '@shared/atlas';
 import { kenney } from '@shared/kenney';
 import { preloadSfx, type SfxGroups } from '@shared/phaser';
 
@@ -80,28 +81,9 @@ export const PUFFER = { frame: 'fish_brown', len: 64, speed: [28, 45] as [number
 /** An eel is the long tail piece followed by the head piece. */
 export const EEL = { tail: 'fish_grey_long_a', head: 'fish_grey_long_b', len: 250, speed: 330 };
 
-/**
- * Copies the pack's atlas into one with clear gaps between frames, under the same frame names.
- * The original packs its 128px cells edge to edge, so scaled sprites pick up hairlines of their
- * neighbours (seaweed especially, whose cells sit next to full-bleed terrain tiles).
- */
-export function padAtlas(scene: Phaser.Scene) {
-  if (scene.textures.exists(SHEET)) return;
-  const raw = scene.textures.get(RAW_SHEET);
-  const names = raw.getFrameNames();
-  const pad = 4;
-  const cell = 128 + pad * 2;
-  const cols = Math.ceil(Math.sqrt(names.length));
-  const tex = scene.textures.createCanvas(SHEET, cols * cell, Math.ceil(names.length / cols) * cell)!;
-  names.forEach((name, i) => {
-    const f = raw.get(name);
-    const x = (i % cols) * cell + pad;
-    const y = Math.floor(i / cols) * cell + pad;
-    tex.context.drawImage(f.source.image as CanvasImageSource, f.cutX, f.cutY, f.cutWidth, f.cutHeight, x, y, f.cutWidth, f.cutHeight);
-    tex.add(name, 0, x, y, f.cutWidth, f.cutHeight);
-  });
-  tex.refresh();
-  scene.textures.remove(RAW_SHEET);
+/** Repacks the pack's atlas with gaps between its edge-to-edge 128px cells (see padAtlas). */
+export function unpackSheet(scene: Phaser.Scene) {
+  padAtlas(scene, RAW_SHEET, SHEET);
 }
 
 /** The opaque part of a frame, in frame pixels relative to the frame's centre. */
