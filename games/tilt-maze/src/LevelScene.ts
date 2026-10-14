@@ -23,6 +23,13 @@ const SPINNER_SCALE = 0.75;
 const LASER_CYCLE = 3000;
 const LASER_ON = 1700;
 
+/**
+ * Walls are frictionless. The ball would really roll along a wall rather than rub on it, and
+ * Matter takes the larger static friction of a pair, so its default 0.5 made the ball stick
+ * whenever it was pressed into a wall.
+ */
+const WALL: Phaser.Types.Physics.Matter.MatterBodyConfig = { isStatic: true, restitution: 0.3, friction: 0, frictionStatic: 0, label: 'wall' };
+
 /** block_corner.png has its right angle at the bottom left; the other corners are that turned clockwise. */
 const CORNER_ANGLE: Record<Corner, number> = { 1: 0, 4: 90, 3: 180, 2: 270 };
 const CORNER_VERTS: Record<Corner, number[]> = {
@@ -161,16 +168,14 @@ export class LevelScene extends Phaser.Scene {
 
     // The frame's walls, just outside the board.
     const t = 100;
-    const edge = { isStatic: true, restitution: 0.3, label: 'wall' };
-    this.matter.add.rectangle(x + w / 2, y - t / 2, w + t * 2, t, edge);
-    this.matter.add.rectangle(x + w / 2, y + h + t / 2, w + t * 2, t, edge);
-    this.matter.add.rectangle(x - t / 2, y + h / 2, t, h, edge);
-    this.matter.add.rectangle(x + w + t / 2, y + h / 2, t, h, edge);
+    this.matter.add.rectangle(x + w / 2, y - t / 2, w + t * 2, t, WALL);
+    this.matter.add.rectangle(x + w / 2, y + h + t / 2, w + t * 2, t, WALL);
+    this.matter.add.rectangle(x - t / 2, y + h / 2, t, h, WALL);
+    this.matter.add.rectangle(x + w + t / 2, y + h / 2, t, h, WALL);
   }
 
   private buildPieces() {
     const { maze } = this;
-    const wall = { isStatic: true, restitution: 0.3, label: 'wall' };
 
     const start = this.at(maze.start);
     this.add.image(start.x, start.y, 'rb', 'hole_start.png');
@@ -184,7 +189,7 @@ export class LevelScene extends Phaser.Scene {
     for (const r of maze.walls) {
       const p = this.at(r);
       this.add.nineslice(p.x + r.w / 2, p.y + r.h / 2, 'rb', 'block_square.png', r.w, r.h, 14, 14, 14, 14);
-      this.matter.add.rectangle(p.x + r.w / 2, p.y + r.h / 2, r.w, r.h, wall);
+      this.matter.add.rectangle(p.x + r.w / 2, p.y + r.h / 2, r.w, r.h, WALL);
     }
     for (const r of maze.locked) {
       const p = this.at(r);
@@ -193,7 +198,7 @@ export class LevelScene extends Phaser.Scene {
           this.lockedParts.push(this.add.image(p.x + cx + CELL / 2, p.y + cy + CELL / 2, 'rb', 'block_locked_square.png'));
         }
       }
-      this.lockedBodies.push(this.matter.add.rectangle(p.x + r.w / 2, p.y + r.h / 2, r.w, r.h, wall));
+      this.lockedBodies.push(this.matter.add.rectangle(p.x + r.w / 2, p.y + r.h / 2, r.w, r.h, WALL));
     }
     for (const tri of maze.triangles) {
       const p = this.at(tri);
@@ -202,7 +207,7 @@ export class LevelScene extends Phaser.Scene {
       const v = CORNER_VERTS[tri.corner];
       const cx = (v[0] + v[2] + v[4]) / 3;
       const cy = (v[1] + v[3] + v[5]) / 3;
-      this.matter.add.fromVertices(p.x - CELL / 2 + cx, p.y - CELL / 2 + cy, v.join(' '), wall);
+      this.matter.add.fromVertices(p.x - CELL / 2 + cx, p.y - CELL / 2 + cy, v.join(' '), WALL);
     }
 
     this.maze.lasers.forEach((laser, i) => {
@@ -221,7 +226,7 @@ export class LevelScene extends Phaser.Scene {
 
     this.spinners = maze.spinners.map((s, i) => {
       const p = this.at(s);
-      const bar = this.matter.add.image(p.x, p.y, 'rb', 'block_rotate_narrow.png', { isStatic: true, restitution: 0.4, label: 'wall' });
+      const bar = this.matter.add.image(p.x, p.y, 'rb', 'block_rotate_narrow.png', { ...WALL, restitution: 0.4 });
       // At three quarters size the tip clears the 3 x 3 cells around it by more than the ball's width,
       // so a ball resting against a wall there can't get pinned.
       bar.setScale(SPINNER_SCALE).setRotation(i * 0.9);
@@ -260,7 +265,7 @@ export class LevelScene extends Phaser.Scene {
     this.ball = this.matter.add.image(start.x, start.y, 'rb', frame, {
       shape: { type: 'circle', radius: 32 },
       restitution: 0.4,
-      friction: 0.005,
+      friction: 0,
       frictionStatic: 0,
       frictionAir: 0.012,
       label: 'ball',
