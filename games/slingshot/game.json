@@ -1,0 +1,22 @@
+{
+  "title": "Slingshot",
+  "description": "Pull back and fling a little probe through space. Planets bend its path: swing round them, thread the gaps, dodge the asteroids and dock with the station, picking up three stars on the way.",
+  "thumbnail": "2D assets/Planets/Sample.png",
+  "assets": [
+    "2D assets/Planets/Planets/planet0[0-9].png",
+    "2D assets/Space Shooter Extension/PNG/Sprites/Building/spaceBuilding_014.png",
+    "2D assets/Space Shooter Extension/PNG/Sprites/Station/spaceStation_021.png",
+    "2D assets/Space Shooter Remastered/Backgrounds/darkPurple.png",
+    "2D assets/Space Shooter Remastered/PNG/Power-ups/star_gold.png",
+    "2D assets/Space Shooter Remastered/PNG/Meteors/meteor{Brown,Grey}_{big1,big2,big3,big4,med1}.png",
+    "2D assets/Simple Space/PNG/Default/star_{small,tiny}.png",
+    "2D assets/Explosion Pack/Spritesheets/spritesheet_regularExplosion.*",
+    "2D assets/Particle Pack/PNG (Transparent)/star_06.png",
+    "Audio/Sci-Fi Sounds/Audio/{explosionCrunch_000,explosionCrunch_001,thrusterFire_000,doorClose_000,forceField_001}.ogg",
+    "Audio/Digital Audio/Audio/{powerUp2,powerUp7,lowDown,phaseJump2}.ogg",
+    "Audio/Interface Sounds/Audio/{click_001,click_002,tick_001,tick_002,error_004}.ogg",
+    "Audio/Music Jingles/Audio (Retro)/jingles-retro_{01,15}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{level,[1-9],10,mission_completed,congratulations,new_highscore}.ogg",
+    "Audio/Music Loops/Loops/Mission Plausible.ogg"
+  ]
+}

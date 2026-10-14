@@ -70,7 +70,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Pixel Platformer (+ Blocks / Farm / Food / Industrial) | **Pixel Hop**: retro platformer with themed worlds per expansion. |
 | | Pixel Shmup | **Mini Shmup**: vertical pixel shooter with enemy waves. |
 | | Pixel Vehicle Pack | **Rush Hour**: top-down pixel traffic dodger. |
-| | Planets | **Slingshot**: launch a probe around gravity wells to a target. |
+| ✅ | Planets | Used in **Slingshot**: fling a probe round the planets' gravity to dock with a space station. |
 | | Platformer Assets Base | **Classic Platformer**: the original Kenney alien platformer. |
 | | Platformer Assets Buildings | **Rooftop Run**: endless runner across rooftops. |
 | | Platformer Assets Candy | **Candy Climb**: vertical climber through a candy world. |
