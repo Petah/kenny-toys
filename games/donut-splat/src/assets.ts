@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { preloadIcons } from '@shared/icons';
 import { kenney } from '@shared/kenney';
 import { preloadSfx, type SfxGroups } from '@shared/phaser';
 
@@ -17,6 +18,7 @@ export const SFX = {
 export const SPLAT_COUNT = 36;
 
 export function preloadAssets(scene: Phaser.Scene) {
+  preloadIcons(scene);
   scene.load.atlasXML('donuts', kenney('2D assets/Donuts/Spritesheet/donuts_sheet.png'), kenney('2D assets/Donuts/Spritesheet/donuts_sheet.xml'));
   for (let i = 0; i < SPLAT_COUNT; i++) {
     const n = String(i).padStart(2, '0');

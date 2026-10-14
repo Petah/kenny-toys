@@ -12,7 +12,7 @@ export default defineConfig({
   plugins: [
     kenney({
       root: KENNEY_ROOT,
-      sharedAssets: ['Other/Fonts/Kenney Future.ttf', 'Other/Fonts/Kenney Bold.ttf'],
+      sharedAssets: ['Other/Fonts/Kenney Future.ttf', 'Other/Fonts/Kenney Bold.ttf', 'Icons/Game Icons/Spritesheet/sheet_white2x.{png,xml}'],
     }),
   ],
   build: {

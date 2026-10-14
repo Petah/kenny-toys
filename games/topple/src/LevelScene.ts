@@ -302,8 +302,8 @@ export class LevelScene extends Phaser.Scene {
       this.add.image(WIDTH / 2 + (i - (n - 1) / 2) * 34, 70, 'elements', shotFrame(kind)).setScale(0.4),
     );
 
-    const restart = makeButton(this, WIDTH - 52, HEIGHT - 44, '↻', () => this.restart(), { w: 64, h: 56, size: 34, color: 0x3d7fb8 });
-    const menu = makeButton(this, WIDTH - 128, HEIGHT - 44, '☰', () => this.toMenu(), { w: 64, h: 56, size: 30, color: 0x3d7fb8 });
+    const restart = makeButton(this, WIDTH - 52, HEIGHT - 44, 'restart', () => this.restart(), { icon: 'return.png', w: 64, h: 56, size: 34, color: 0x3d7fb8 });
+    const menu = makeButton(this, WIDTH - 128, HEIGHT - 44, 'menu', () => this.toMenu(), { icon: 'menuList.png', w: 64, h: 56, size: 30, color: 0x3d7fb8 });
     this.hud = this.add.container(0, 0, [title, this.scoreText, bestText, ...this.shotIcons, ...restart.parts, ...menu.parts]).setDepth(50);
 
     // Waiting ammo lines up on the ground behind the slingshot.

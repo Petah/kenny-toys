@@ -284,8 +284,8 @@ export class LevelScene extends Phaser.Scene {
         .text(width - PAD, footY + 30, `best ${formatTime(best)}`, { ...TEXT, fontSize: '18px', strokeThickness: 4, color: '#ffe27a' })
         .setOrigin(1, 0.5);
     }
-    button(this, '↻', () => this.restart(), { w: 76, h: 60, size: 34, color: 0x2a78b5 }).setPosition(width / 2 - 46, footY);
-    button(this, '☰', () => this.toMenu(), { w: 76, h: 60, size: 30, color: 0x2a78b5 }).setPosition(width / 2 + 46, footY);
+    button(this, 'restart', () => this.restart(), { icon: 'return.png', w: 76, h: 60, size: 34, color: 0x2a78b5 }).setPosition(width / 2 - 46, footY);
+    button(this, 'menu', () => this.toMenu(), { icon: 'menuList.png', w: 76, h: 60, size: 30, color: 0x2a78b5 }).setPosition(width / 2 + 46, footY);
 
     const tip = TIPS[this.levelIndex];
     if (tip) {

@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { ICONS } from './icons';
 
 export interface Button {
   zone: Phaser.GameObjects.Zone;
@@ -13,6 +14,8 @@ export interface ButtonOptions {
   color?: number;
   size?: number;
   disabled?: boolean;
+  /** Draw this frame from the shared icon atlas (see icons.ts) instead of the label. */
+  icon?: string;
   /** Called on every press, before onClick. Usually a click sound. */
   onPress?: () => void;
 }
@@ -30,10 +33,11 @@ export function makeButton(scene: Phaser.Scene, x: number, y: number, label: str
     g.lineStyle(4, 0xffffff, 0.35).strokeRoundedRect(x - w / 2 + 3, y - h / 2 + 3 + (pressed ? 4 : 0), w - 6, h - 6, 15);
   };
   draw(false);
-  const text = scene.add
-    .text(x, y, label, { ...opts.textStyle, fontSize: `${opts.size ?? 34}px`, strokeThickness: 6, stroke: '#1d3b4c' })
-    .setOrigin(0.5)
-    .setAlpha(opts.disabled ? 0.6 : 1);
+  const size = opts.size ?? 34;
+  const text = opts.icon
+    ? iconLabel(scene, x, y, opts.icon, size)
+    : scene.add.text(x, y, label, { ...opts.textStyle, fontSize: `${size}px`, strokeThickness: 6, stroke: '#1d3b4c' }).setOrigin(0.5);
+  text.setAlpha(opts.disabled ? 0.6 : 1);
   const zone = scene.add.zone(x, y, w, h);
   if (!opts.disabled) {
     zone.setInteractive({ useHandCursor: true });
@@ -54,4 +58,12 @@ export function makeButton(scene: Phaser.Scene, x: number, y: number, label: str
     });
   }
   return { zone, parts: [g, text, zone] };
+}
+
+/** An icon with a dark shadow under it, standing in for a text label's outline. Sized to `size` pixels. */
+function iconLabel(scene: Phaser.Scene, x: number, y: number, frame: string, size: number) {
+  const scale = (size * 1.25) / 100;
+  const shadow = scene.add.image(0, 3, ICONS, frame).setScale(scale).setTint(0x1d3b4c).setAlpha(0.8);
+  const icon = scene.add.image(0, 0, ICONS, frame).setScale(scale);
+  return scene.add.container(x, y, [shadow, icon]);
 }

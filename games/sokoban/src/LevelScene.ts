@@ -167,7 +167,7 @@ export class LevelScene extends Phaser.Scene {
 
     this.undoButton = button(this, 'UNDO', () => this.undo(), { w: 150, h: 64, size: 26, color: 0x3d7fb8 });
     const reset = button(this, 'RESET', () => this.restart(), { w: 150, h: 64, size: 26, color: 0x3d7fb8 });
-    const menu = button(this, '☰', () => this.toMenu(), { w: 72, h: 64, size: 30, color: 0x3d7fb8 });
+    const menu = button(this, 'menu', () => this.toMenu(), { icon: 'menuList.png', w: 72, h: 64, size: 30, color: 0x3d7fb8 });
     this.undoButton.setPosition(-120, 0);
     reset.setPosition(50, 0);
     menu.setPosition(180, 0);

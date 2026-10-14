@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 import { FONT_HEADING } from '@shared/fonts';
+import { ICONS } from '@shared/icons';
 import { playSfx } from '@shared/phaser';
 import { load, submitHighScore } from '@shared/storage';
 import { SFX, SPLAT_COUNT, preloadAssets } from './assets';
@@ -354,8 +355,9 @@ export class SplatScene extends Phaser.Scene {
     icon?.setTint(0x222222).setAlpha(0.35);
     if (icon) this.tweens.add({ targets: icon, scale: icon.scale * 1.5, duration: 120, yoyo: true });
     const cross = this.add
-      .text(Phaser.Math.Clamp(x, 40, this.scale.width - 40), this.scale.height - 50 * this.u, '✕', { ...TEXT, fontSize: `${Math.round(60 * this.u)}px`, color: '#ff5a6e' })
-      .setOrigin(0.5)
+      .image(Phaser.Math.Clamp(x, 40, this.scale.width - 40), this.scale.height - 50 * this.u, ICONS, 'cross.png')
+      .setScale(0.6 * this.u)
+      .setTint(0xff5a6e)
       .setDepth(65);
     this.tweens.add({ targets: cross, alpha: 0, y: cross.y - 40, delay: 400, duration: 500, onComplete: () => cross.destroy() });
     if (this.lives <= 0) this.gameOver();

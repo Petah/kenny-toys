@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { preloadIcons } from '@shared/icons';
 import { kenney } from '@shared/kenney';
 import { preloadSfx, type SfxGroups } from '@shared/phaser';
 
@@ -41,6 +42,7 @@ export type Voice = (typeof VOICES)[number];
 export const BACKDROPS = ['grass', 'desert', 'shroom', 'land'] as const;
 
 export function preloadAssets(scene: Phaser.Scene) {
+  preloadIcons(scene);
   for (const atlas of ['elements', 'aliens', 'debris', 'tiles']) {
     scene.load.atlasXML(atlas, kenney(`${PACK}/Spritesheet/spritesheet_${atlas}.png`), kenney(`${PACK}/Spritesheet/spritesheet_${atlas}.xml`));
   }

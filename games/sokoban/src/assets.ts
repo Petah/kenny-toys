@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { preloadIcons } from '@shared/icons';
 import { kenney } from '@shared/kenney';
 import { preloadSfx, type SfxGroups } from '@shared/phaser';
 import type { Dir, Color } from './sokoban';
@@ -50,6 +51,7 @@ export const FRAMES = {
 };
 
 export function preloadAssets(scene: Phaser.Scene) {
+  preloadIcons(scene);
   scene.load.atlasXML('soko', kenney(`${PACK}.png`), kenney(`${PACK}.xml`));
   scene.load.image('sparkle', kenney('2D assets/Particle Pack/PNG (Transparent)/star_06.png'));
   scene.load.image('puff', kenney('2D assets/Smoke Particles/PNG/White puff/whitePuff00.png'));

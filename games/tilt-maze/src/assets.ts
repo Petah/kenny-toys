@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { preloadIcons } from '@shared/icons';
 import { kenney } from '@shared/kenney';
 import { preloadSfx, type SfxGroups } from '@shared/phaser';
 
@@ -32,6 +33,7 @@ export const VOICES = ['level', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10
 export type Voice = (typeof VOICES)[number];
 
 export function preloadAssets(scene: Phaser.Scene) {
+  preloadIcons(scene);
   scene.load.atlasXML('rb', kenney(`${PACK}.png`), kenney(`${PACK}.xml`));
   scene.load.image('sparkle', kenney('2D assets/Particle Pack/PNG (Transparent)/star_06.png'));
   preloadSfx(scene, SFX);

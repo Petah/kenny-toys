@@ -37,7 +37,8 @@ export class TitleScene extends Phaser.Scene {
       const y = 315 + Math.floor(i / cols) * 150;
       const open = isUnlocked(i);
       const stars = progress.stars[i] ?? 0;
-      const btn = makeButton(this, x, y, open ? String(i + 1) : '🔒', () => this.startLevel(i), {
+      const btn = makeButton(this, x, y, String(i + 1), () => this.startLevel(i), {
+        icon: open ? undefined : 'locked.png',
         w: 150,
         h: 110,
         size: open ? 56 : 40,
