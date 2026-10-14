@@ -16,11 +16,18 @@ export default defineConfig({
     }),
   ],
   build: {
-    // Phaser alone is ~1.3 MB; it gets its own chunk so the browser caches it once for every game.
-    chunkSizeWarningLimit: 1500,
+    // Each engine gets its own chunk so the browser caches it once for every game that uses it.
+    // Phaser is ~1.3 MB; Rapier's compat build inlines its WebAssembly and is ~2.9 MB (1.1 MB gzipped).
+    chunkSizeWarningLimit: 3000,
     rolldownOptions: {
       output: {
-        codeSplitting: { groups: [{ name: 'phaser', test: /node_modules[\\/]phaser/ }] },
+        codeSplitting: {
+          groups: [
+            { name: 'phaser', test: /node_modules[\\/]phaser/ },
+            { name: 'three', test: /node_modules[\\/]three/ },
+            { name: 'rapier', test: /node_modules[\\/]@dimforge/ },
+          ],
+        },
       },
       // One page per game, plus the launcher at the root.
       input: {
