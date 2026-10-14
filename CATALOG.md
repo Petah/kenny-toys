@@ -107,7 +107,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Skyboxes | *(3D backdrop)*: skies for the three.js games. |
 | | Smilies | **Mood Pop**: pop the smilies that match the shown mood. |
 | | Smoke Particles | *(effects)*: puffs and blasts for explosions and engines. |
-| 🎯 | Sokoban Pack | **Sokoban**: push crates onto targets. |
+| ✅ | Sokoban Pack | Used in **Sokoban**: push crates onto targets. |
 | | Space Shooter Remastered / Extension | **Space Blaster**: horizontal or vertical space shooter with power-ups. |
 | ✅ | Splat Pack | Used in **Donut Splat**; also **Paint Splatter**, a pure splat-painting toy. |
 | | Sports Pack | **Penalty Kicks**: flick shots past a keeper. |

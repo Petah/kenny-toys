@@ -1,0 +1,18 @@
+{
+  "title": "Sokoban",
+  "description": "Push every crate onto its spot. Twelve tidy warehouse puzzles, colour-matched crates, unlimited undo and coins for beating par.",
+  "thumbnail": "2D assets/Sokoban Pack/Sample.png",
+  "assets": [
+    "2D assets/Sokoban Pack/Spritesheet/sokoban_spritesheet.{png,xml}",
+    "2D assets/Particle Pack/PNG (Transparent)/star_06.png",
+    "2D assets/Smoke Particles/PNG/White puff/whitePuff00.png",
+    "Audio/Impact Sounds/Audio/footstep_concrete_00[0-4].ogg",
+    "Audio/Impact Sounds/Audio/impactWood_medium_00[0-4].ogg",
+    "Audio/Impact Sounds/Audio/impactSoft_medium_00[0-4].ogg",
+    "Audio/Interface Sounds/Audio/{click_001,click_002,confirmation_002,back_001,back_002,drop_002,error_004}.ogg",
+    "2D assets/Desert Shooter Pack/Sounds/{coin-a,coin-b}.ogg",
+    "Audio/Music Jingles/Audio (Retro)/jingles-retro_{04,10}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{level,[1-9],10,objective_achieved,congratulations,new_highscore}.ogg",
+    "Audio/Music Loops/Loops/Mishief Stroll.ogg"
+  ]
+}

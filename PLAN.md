@@ -52,7 +52,7 @@ Status: ✅ done · 🚧 in progress · ⬜ idea
 | ⬜ | Downhill | Tiny Ski | SkiFree-style endless slope. |
 | ⬜ | Domino Chain | Domino Pack | Place dominoes, tip the first, watch the chain. |
 | ⬜ | Word Drop | Letter Tiles Redux | Falling letters, spell words to clear them. |
-| ⬜ | Sokoban | Sokoban Pack | Push crates onto targets. |
+| ✅ | Sokoban | Sokoban Pack | Push crates onto targets: 12 levels, colour-matched crates, undo, tap-to-walk, coins for matching par. Levels come from `games/sokoban/scripts/generate.ts`; `check-levels.ts` solves them and checks each par. |
 | ⬜ | Emote Match | Emote Pack, Smilies | Match-3 with emotes. |
 | ⬜ | Blackjack | Playing Cards, Casino Audio | Quick card table. |
 | ⬜ | Mini Shmup | Pixel Shmup | Vertical shooter waves. |
