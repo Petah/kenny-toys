@@ -1,0 +1,18 @@
+{
+  "title": "Downhill",
+  "description": "SkiFree, in tiny pixels. Steer down an endless slope past trees, rocks and snowmen, fly off ramps and thread the slalom gates for style. Keep going, because sooner or later the yeti comes looking for you.",
+  "thumbnail": "2D assets/Tiny Ski/Sample.png",
+  "assets": [
+    "2D assets/Tiny Ski/Tilemap/tilemap_packed.png",
+    "Audio/Impact Sounds/Audio/footstep_snow_00[0-4].ogg",
+    "Audio/Impact Sounds/Audio/impactSoft_heavy_00[0-2].ogg",
+    "Audio/Impact Sounds/Audio/impactWood_heavy_00[0-1].ogg",
+    "Audio/Retro Sounds 2/Audio/{jump1,jump2,coin1,coin2,coin3,hurt1,hurt2,upgrade2}.ogg",
+    "Audio/Retro Sounds 1/Audio/{creature1,creature3,rumble1}.ogg",
+    "Audio/Foley Sounds/Audio/Woosh/woosh{2,5}.ogg",
+    "Audio/Interface Sounds/Audio/{click_001,click_002,tick_001,tick_002,confirmation_002}.ogg",
+    "Audio/Music Jingles/Audio (Pizzicato)/jingles-pizzicato_03.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{go,game_over,new_highscore,war_look_out}.ogg",
+    "Audio/Music Loops/Loops/Infinite Descent.ogg"
+  ]
+}

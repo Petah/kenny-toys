@@ -116,7 +116,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Tiny Battle | **Tiny Tactics**: turn-based squad battle on a tiny grid. |
 | | Tiny Dungeon | **Tiny Crawler**: one-floor dungeon crawl with keys and chests. |
 | | Tiny Farm | **Tiny Harvest**: plant, grow and sell crops. |
-| 🎯 | Tiny Ski | **Downhill**: SkiFree-style endless slope (and the yeti). |
+| ✅ | Tiny Ski | Used in **Downhill**: SkiFree-style endless slope, with the yeti. |
 | | Tiny Town | **Tiny Village**: top-down walk-and-talk village. |
 | | Toon Characters | **Toon Poser**: pick a toon and cycle its 45 poses. |
 | | Topdown Shooter / (Pixel) | **Zombie Survival**: top-down twin-stick wave survival. |
