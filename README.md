@@ -87,4 +87,4 @@ Requests reach the site like this, all one-time setup that's already done:
 
 ## License
 
-The Kenney assets are CC0 (public domain). The code in this repository doesn't have a license yet.
+The code is under the [MIT License](LICENSE). The Kenney assets are CC0 (public domain) and aren't in this repository.
