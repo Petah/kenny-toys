@@ -18,6 +18,13 @@ const BALL_RADIUS = 32 * BALL_SCALE;
 /** How far a joystick drag goes before it counts as full tilt. */
 const JOY_RANGE = 90;
 const SPIN_SPEED = 1.5;
+/** How far the board leans at full tilt (radians), and the viewer's distance for perspective. */
+const LEAN = 0.14;
+const EYE = 1500;
+/** Board margin drawn into the tilted texture, so the white frame is included. */
+const MARGIN = 16;
+/** The tilted board is drawn as a grid of this many cells per board cell; finer hides texture warping. */
+const MESH_DENSITY = 1;
 const SPINNER_SCALE = 0.75;
 /** Lasers repeat every LASER_CYCLE ms and are on for the first LASER_ON of it. */
 const LASER_CYCLE = 3000;
@@ -63,8 +70,15 @@ export class LevelScene extends Phaser.Scene {
   private origin = { x: 0, y: 0 };
   private hudH = 0;
   private state: State = 'play';
+  /** The physics body. It stays invisible and never scales; ballImg is what's drawn. */
   private ball!: MatterImage;
+  private ballImg!: Phaser.GameObjects.Image;
   private shadow!: Phaser.GameObjects.Image;
+  /** Everything on the board, drawn into boardTex each frame and shown on a perspective mesh. */
+  private layer!: Phaser.GameObjects.Container;
+  private boardTex!: Phaser.Textures.DynamicTexture;
+  private mesh!: Phaser.GameObjects.Mesh2D;
+  private grid = { cols: 0, rows: 0 };
   private frameShadow!: Phaser.GameObjects.Graphics;
   private tilt = new Phaser.Math.Vector2();
   private joy?: { x: number; y: number; vec: Phaser.Math.Vector2 };
@@ -119,6 +133,7 @@ export class LevelScene extends Phaser.Scene {
     this.buildBoard();
     this.buildPieces();
     this.buildBall();
+    this.buildPerspective();
     this.buildHud();
 
     const kb = this.input.keyboard!;
@@ -270,8 +285,74 @@ export class LevelScene extends Phaser.Scene {
       frictionAir: 0.012,
       label: 'ball',
     });
-    // The highlight is painted on, so the ball mustn't visibly spin.
-    this.ball.setScale(BALL_SCALE).setFixedRotation().setDepth(20);
+    // The body is never rescaled: Phaser scales a Matter body with its image, and growing back
+    // from zero after a fall divided by zero and broke it. The drawn ball does the animating.
+    this.ball.setScale(BALL_SCALE).setFixedRotation().setVisible(false);
+    // The highlight is painted on, so the drawn ball doesn't spin.
+    this.ballImg = this.add.image(start.x, start.y, 'rb', frame).setScale(BALL_SCALE).setDepth(20);
+  }
+
+  // ---- Perspective ------------------------------------------------------------------------------
+
+  /**
+   * Moves everything built so far (except the board's drop shadow) into a container that's
+   * drawn into a texture each frame, then shows that texture on a grid mesh whose corners are
+   * projected as if the board were leaning in 3D, so tilting visibly tips the board.
+   */
+  private buildPerspective() {
+    const parts = this.children.list.filter((o) => o !== this.frameShadow);
+    parts.sort((a, b) => (a as unknown as { depth: number }).depth - (b as unknown as { depth: number }).depth);
+    this.layer = this.make.container({ x: 0, y: 0 }, false);
+    this.layer.add(parts);
+
+    const w = this.maze.cols * CELL + MARGIN * 2;
+    const h = this.maze.rows * CELL + MARGIN * 2;
+    const existing = this.textures.exists('tilt-board') ? (this.textures.get('tilt-board') as Phaser.Textures.DynamicTexture) : null;
+    this.boardTex = existing ? existing.setSize(w, h) : this.textures.addDynamicTexture('tilt-board', w, h)!;
+
+    this.grid = { cols: this.maze.cols * MESH_DENSITY, rows: this.maze.rows * MESH_DENSITY };
+    const vertices: number[] = [];
+    const indices: number[] = [];
+    for (let j = 0; j <= this.grid.rows; j++) {
+      for (let i = 0; i <= this.grid.cols; i++) vertices.push(0, 0, i / this.grid.cols, j / this.grid.rows);
+    }
+    const stride = this.grid.cols + 1;
+    for (let j = 0; j < this.grid.rows; j++) {
+      for (let i = 0; i < this.grid.cols; i++) {
+        const a = j * stride + i;
+        indices.push(a, a + 1, a + stride, 0, a + 1, a + stride + 1, a + stride, 0);
+      }
+    }
+    // Render textures are stored bottom-up, so the texture coordinates flip vertically.
+    this.mesh = this.add.mesh2d(0, 0, 'tilt-board', vertices, indices, true).setDepth(5);
+    this.mesh.buildOrderedIndices(1, true);
+    this.drawBoard();
+  }
+
+  /** Redraws the board texture and leans the mesh by the current tilt. */
+  private drawBoard() {
+    this.boardTex.clear().draw(this.layer, MARGIN - this.origin.x, MARGIN - this.origin.y).render();
+
+    const w = this.boardTex.width;
+    const h = this.boardTex.height;
+    const cx = this.origin.x - MARGIN + w / 2;
+    const cy = this.origin.y - MARGIN + h / 2;
+    // Tilting towards a side lowers that side, away from the viewer, so it draws a little smaller.
+    const ax = this.tilt.y * LEAN;
+    const ay = this.tilt.x * LEAN;
+    const v = this.mesh.vertices;
+    for (let j = 0, n = 0; j <= this.grid.rows; j++) {
+      for (let i = 0; i <= this.grid.cols; i++, n += 4) {
+        const lx = (i / this.grid.cols - 0.5) * w;
+        const ly = (j / this.grid.rows - 0.5) * h;
+        const y1 = ly * Math.cos(ax);
+        const x1 = lx * Math.cos(ay);
+        const z = ly * Math.sin(ax) + lx * Math.sin(ay);
+        const k = EYE / (EYE + z);
+        v[n] = cx + x1 * k;
+        v[n + 1] = cy + y1 * k;
+      }
+    }
   }
 
   // ---- HUD ---------------------------------------------------------------------------------------
@@ -332,7 +413,11 @@ export class LevelScene extends Phaser.Scene {
   update(_time: number, delta: number) {
     this.updateSpinners(delta);
     this.updateLasers();
-    if (this.state !== 'play') return;
+    if (this.state === 'play') this.updatePlay(delta);
+    this.drawBoard();
+  }
+
+  private updatePlay(delta: number) {
 
     this.elapsed += delta;
     this.timeText.setText(formatTime(Math.floor(this.elapsed / 100)));
@@ -346,6 +431,7 @@ export class LevelScene extends Phaser.Scene {
     const v = this.velocity();
     const speed = Math.hypot(v.x, v.y);
     if (speed > MAX_SPEED) this.ball.setVelocity((v.x / speed) * MAX_SPEED, (v.y / speed) * MAX_SPEED);
+    this.ballImg.setPosition(this.ball.x, this.ball.y);
     this.shadow.setPosition(this.ball.x + 4 + this.tilt.x * 3, this.ball.y + 6 + this.tilt.y * 3);
     // The tip gets out of the way once the ball's rolling.
     if (this.tip && speed > 2) {
@@ -505,24 +591,26 @@ export class LevelScene extends Phaser.Scene {
     this.shadow.setVisible(false);
     if (how === 'fall') {
       playSfx(this, SFX, 'fall', { volume: 0.5 });
-      this.tweens.add({ targets: this.ball, x: at.x, y: at.y, scale: 0, duration: 320, ease: 'Quad.easeIn' });
+      this.tweens.add({ targets: this.ballImg, x: at.x, y: at.y, scale: 0, duration: 320, ease: 'Quad.easeIn' });
     } else {
       playSfx(this, SFX, 'zap', { volume: 0.5 });
       this.cameras.main.shake(150, 0.006);
-      this.ball.setTint(0xff5a5a);
-      this.tweens.add({ targets: this.ball, scale: BALL_SCALE * 1.6, alpha: 0, duration: 300 });
+      this.ballImg.setTint(0xff5a5a);
+      this.tweens.add({ targets: this.ballImg, scale: BALL_SCALE * 1.6, alpha: 0, duration: 300 });
     }
     this.time.delayedCall(650, () => this.respawn());
   }
 
   private respawn() {
     const start = this.at(this.maze.start);
-    this.ball.clearTint().setAlpha(1).setPosition(start.x, start.y).setScale(0);
-    this.ball.setSensor(false).setIgnoreGravity(false).setVelocity(0, 0);
+    this.ball.setPosition(start.x, start.y).setSensor(false).setIgnoreGravity(false).setVelocity(0, 0);
+    // Stop the fall or zap animation first, in case a slow frame left it running.
+    this.tweens.killTweensOf(this.ballImg);
+    this.ballImg.clearTint().setAlpha(1).setPosition(start.x, start.y).setScale(0);
     this.tilt.set(0, 0);
     this.shadow.setVisible(true).setPosition(start.x + 4, start.y + 6);
     playSfx(this, SFX, 'respawn', { volume: 0.35 });
-    this.tweens.add({ targets: this.ball, scale: BALL_SCALE, duration: 250, ease: 'Back.easeOut' });
+    this.tweens.add({ targets: this.ballImg, scale: BALL_SCALE, duration: 250, ease: 'Back.easeOut' });
     this.state = 'play';
   }
 
@@ -532,7 +620,7 @@ export class LevelScene extends Phaser.Scene {
     this.shadow.setVisible(false);
     this.matter.world.setGravity(0, 0);
     playSfx(this, SFX, 'goal', { volume: 0.5 });
-    this.tweens.add({ targets: this.ball, x: goal.x, y: goal.y, scale: 0, duration: 450, ease: 'Quad.easeIn' });
+    this.tweens.add({ targets: this.ballImg, x: goal.x, y: goal.y, scale: 0, duration: 450, ease: 'Quad.easeIn' });
     this.sparkles.emitParticleAt(goal.x, goal.y, 20);
 
     const last = this.levelIndex === LEVELS.length - 1;
