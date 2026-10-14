@@ -23,8 +23,10 @@ export function levelProgress(game: string, better: 'higher' | 'lower') {
   return {
     load: loadProgress,
 
+    /** A level opens once the one before it is cleared. A best score counts, since some games clear with no stars. */
     isUnlocked(level: number) {
-      return level === 0 || (loadProgress().stars[level - 1] ?? 0) > 0;
+      const p = loadProgress();
+      return level === 0 || (p.stars[level - 1] ?? 0) > 0 || (p.best[level - 1] ?? 0) > 0;
     },
 
     /** Saves a cleared level and reports whether the score beat a previous best. */
