@@ -343,9 +343,9 @@ export class LevelScene extends Phaser.Scene {
     this.frameShadow.setPosition(-this.tilt.x * 8, -this.tilt.y * 8 + 6);
     this.drawJoystick();
 
-    const body = this.ball.body as MatterJS.BodyType;
-    const speed = Math.hypot(body.velocity.x, body.velocity.y);
-    if (speed > MAX_SPEED) this.ball.setVelocity((body.velocity.x / speed) * MAX_SPEED, (body.velocity.y / speed) * MAX_SPEED);
+    const v = this.velocity();
+    const speed = Math.hypot(v.x, v.y);
+    if (speed > MAX_SPEED) this.ball.setVelocity((v.x / speed) * MAX_SPEED, (v.y / speed) * MAX_SPEED);
     this.shadow.setPosition(this.ball.x + 4 + this.tilt.x * 3, this.ball.y + 6 + this.tilt.y * 3);
     // The tip gets out of the way once the ball's rolling.
     if (this.tip && speed > 2) {
@@ -356,7 +356,7 @@ export class LevelScene extends Phaser.Scene {
     }
 
     this.checkPickups();
-    this.checkHoles();
+    this.checkHoles(delta);
     this.checkLasers();
   }
 
@@ -430,16 +430,21 @@ export class LevelScene extends Phaser.Scene {
     });
   }
 
-  private checkHoles() {
+  /** The ball's velocity in Matter's per-1/60s units, whatever the step rate. */
+  private velocity() {
+    return this.matter.body.getVelocity(this.ball.body as MatterJS.BodyType);
+  }
+
+  private checkHoles(delta: number) {
     const goal = this.at(this.maze.goal);
     const goalOpen = !this.maze.goal.locked || this.hasKey;
-    if (goalOpen && this.pull(goal, 40, 16)) {
+    if (goalOpen && this.pull(goal, 40, 16, delta)) {
       this.win(goal);
       return;
     }
     for (const hole of this.maze.holes) {
       const p = this.at(hole);
-      if (this.pull(p, 28, 12)) {
+      if (this.pull(p, 28, 12, delta)) {
         this.lose(p, 'fall');
         return;
       }
@@ -447,12 +452,13 @@ export class LevelScene extends Phaser.Scene {
   }
 
   /** Draws the ball towards a hole's centre once it's over the rim. True when it drops in. */
-  private pull(p: Point, rim: number, drop: number) {
+  private pull(p: Point, rim: number, drop: number, delta: number) {
     const d = this.distanceTo(p);
     if (d > rim) return false;
     if (d < drop) return true;
-    const strength = 0.35 * (1 - d / rim);
-    const v = (this.ball.body as MatterJS.BodyType).velocity;
+    // Scaled by frame time, so the pull is as strong at 120 frames a second as at 60.
+    const strength = 0.35 * (1 - d / rim) * (delta / (1000 / 60));
+    const v = this.velocity();
     this.ball.setVelocity(v.x + ((p.x - this.ball.x) / d) * strength, v.y + ((p.y - this.ball.y) / d) * strength);
     return false;
   }
@@ -475,7 +481,7 @@ export class LevelScene extends Phaser.Scene {
   private onCollisions(event: Phaser.Physics.Matter.Events.CollisionStartEvent) {
     for (const pair of event.pairs) {
       if (pair.bodyA.label !== 'ball' && pair.bodyB.label !== 'ball') continue;
-      const v = (this.ball.body as MatterJS.BodyType).velocity;
+      const v = this.velocity();
       const n = pair.collision.normal;
       const speed = Math.abs(v.x * n.x + v.y * n.y);
       if (speed < 2 || this.time.now - this.lastKnock < 60) continue;

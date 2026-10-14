@@ -1,5 +1,5 @@
 import { setupGamePage } from '@shared/shell';
-import { createFixedGame } from '@shared/phaser';
+import { MATTER_RUNNER, createFixedGame } from '@shared/phaser';
 import { LevelScene } from './LevelScene';
 import { TitleScene } from './TitleScene';
 import { gameSize, isPortrait } from './ui';
@@ -9,7 +9,7 @@ await setupGamePage();
 let portrait = isPortrait();
 const { width, height } = gameSize(portrait);
 const game = createFixedGame(document.querySelector('#stage')!, [TitleScene, LevelScene], width, height, {
-  physics: { default: 'matter', matter: { gravity: { x: 0, y: 0 } } },
+  physics: { default: 'matter', matter: { gravity: { x: 0, y: 0 }, runner: MATTER_RUNNER } },
 });
 
 // Turning the phone swaps to the mirrored layout: resize the game and start the scene again.

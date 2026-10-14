@@ -29,6 +29,8 @@ interface Creature {
   dead: boolean;
   lastSound: number;
   scaredUntil: number;
+  /** 0..1, eased towards 1 while scared. */
+  tremble: number;
   blinkAt: number;
   color: number;
 }
@@ -199,6 +201,7 @@ export class LevelScene extends Phaser.Scene {
       dead: false,
       lastSound: 0,
       scaredUntil: 0,
+      tremble: 0,
       blinkAt: this.time.now + Phaser.Math.Between(800, 3000),
       color: ALIEN_COLORS[spec.color],
     });
@@ -879,7 +882,7 @@ export class LevelScene extends Phaser.Scene {
       const moving = this.pieces.some((p) => {
         if (p.dead) return false;
         const body = p.obj.body as MatterJS.BodyType;
-        return !body.isSleeping && body.speed > 0.2;
+        return !body.isSleeping && this.matter.body.getSpeed(body) > 0.2;
       });
       this.calmFor = moving || since < 1200 ? 0 : this.calmFor + delta;
       if (this.calmFor > 500 || since > 14000) this.resolveShot();
@@ -907,9 +910,11 @@ export class LevelScene extends Phaser.Scene {
       c.scaredUntil = Math.max(c.scaredUntil, time + 250);
     }
     const scared = time < c.scaredUntil;
-    const jitter = scared ? 2 : 0;
-    c.face.setPosition(c.obj.x + Phaser.Math.FloatBetween(-jitter, jitter), c.obj.y + Phaser.Math.FloatBetween(-jitter, jitter));
-    c.face.setRotation(c.obj.rotation);
+    // A smooth tremble while scared. It's a function of time rather than a random offset each
+    // frame, which read as the face glitching away from its body.
+    c.tremble = Phaser.Math.Linear(c.tremble, scared ? 1 : 0, 0.15);
+    c.face.setPosition(c.obj.x, c.obj.y);
+    c.face.setRotation(c.obj.rotation + Math.sin(time / 28) * 0.07 * c.tremble);
     if (time > c.blinkAt && c.face.scale === SCALE) {
       c.blinkAt = time + Phaser.Math.Between(1800, 4500);
       // A squashy blink; while scared they cringe a little harder.

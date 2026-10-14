@@ -30,6 +30,15 @@ export function playSfx(scene: Phaser.Scene, groups: SfxGroups, name: string, co
   scene.sound.play(key, { detune: Phaser.Math.Between(-150, 150), volume: 0.6, ...config });
 }
 
+/**
+ * Matter steps at a fixed rate whatever the display does. At its default 60 steps a second, a
+ * 120Hz screen (MacBook Pro, newer phones) draws every position twice, so anything moving
+ * judders. 120 steps is one per frame there and two on a 60Hz screen, which these small
+ * scenes can easily afford. Velocities from getVelocity/setVelocity keep the same units;
+ * a body's raw .velocity and .speed are per step, so read them through getVelocity/getSpeed.
+ */
+export const MATTER_RUNNER = { fps: 120 };
+
 /** A game with a fixed design resolution, letterboxed to fit its parent. For arcade-style layouts. */
 export function createFixedGame(parent: HTMLElement, scenes: Phaser.Types.Scenes.SceneType[], width: number, height: number, extra: Phaser.Types.Core.GameConfig = {}) {
   return createGame(parent, scenes, {

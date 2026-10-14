@@ -1,5 +1,5 @@
 import { setupGamePage } from '@shared/shell';
-import { createFixedGame } from '@shared/phaser';
+import { MATTER_RUNNER, createFixedGame } from '@shared/phaser';
 import { LevelScene } from './LevelScene';
 import { TitleScene } from './TitleScene';
 import { HEIGHT, WIDTH } from './ui';
@@ -10,6 +10,7 @@ const game = createFixedGame(document.querySelector('#stage')!, [TitleScene, Lev
   physics: {
     default: 'matter',
     matter: {
+      runner: MATTER_RUNNER,
       gravity: { x: 0, y: 1 },
       enableSleeping: true,
       positionIterations: 10,
