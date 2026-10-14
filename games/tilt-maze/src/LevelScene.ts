@@ -34,7 +34,7 @@ const CORNER_VERTS: Record<Corner, number[]> = {
 
 const TIPS: Record<number, [string, string]> = {
   // [desktop, touch]
-  0: ['Tilt with the arrow keys or WASD, or drag the mouse', 'Tilt your phone to roll, or drag a finger'],
+  0: ['Arrow keys, WASD or drag to tilt', 'Tilt your phone, or drag a finger'],
   1: ['Holes send you back to the start', 'Holes send you back to the start'],
   3: ['Grab the key to open the yellow blocks', 'Grab the key to open the yellow blocks'],
   5: ['Time your run past the spinners', 'Time your run past the spinners'],
@@ -342,7 +342,13 @@ export class LevelScene extends Phaser.Scene {
     const speed = Math.hypot(body.velocity.x, body.velocity.y);
     if (speed > MAX_SPEED) this.ball.setVelocity((body.velocity.x / speed) * MAX_SPEED, (body.velocity.y / speed) * MAX_SPEED);
     this.shadow.setPosition(this.ball.x + 4 + this.tilt.x * 3, this.ball.y + 6 + this.tilt.y * 3);
-    if (this.tip && speed > 2 && !this.tweens.isTweening(this.tip)) this.tweens.add({ targets: this.tip, alpha: 0, duration: 400 });
+    // The tip gets out of the way once the ball's rolling.
+    if (this.tip && speed > 2) {
+      const tip = this.tip;
+      this.tip = undefined;
+      this.tweens.killTweensOf(tip);
+      this.tweens.add({ targets: tip, alpha: 0, duration: 400 });
+    }
 
     this.checkPickups();
     this.checkHoles();
