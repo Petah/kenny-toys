@@ -597,7 +597,7 @@ export class LevelScene extends Phaser.Scene {
     this.dust.explode(3, x, y);
     this.sfx(breakSound(block.material), 0.7);
     this.addScore(MATERIALS[block.material].points, x, y, MATERIALS[block.material].color);
-    this.wakeAround(x, y, 220);
+    this.wakeAll();
     if (block.material === 'tnt') this.time.delayedCall(60, () => this.explode(x, y));
   }
 
@@ -639,10 +639,13 @@ export class LevelScene extends Phaser.Scene {
     }
   }
 
-  private wakeAround(x: number, y: number, radius: number) {
-    for (const p of this.pieces) {
-      if (!p.dead && Phaser.Math.Distance.Between(x, y, p.obj.x, p.obj.y) < radius) p.obj.setAwake();
-    }
+  /**
+   * Wakes every piece. Blocks start asleep so towers stand still, and Matter doesn't wake a
+   * sleeping body when what it rests on disappears, so after anything breaks the whole level
+   * is woken; settled pieces fall asleep again by themselves.
+   */
+  private wakeAll() {
+    for (const p of this.pieces) if (!p.dead) p.obj.setAwake();
   }
 
   // ---- Creatures ---------------------------------------------------------------------------------------
@@ -677,7 +680,7 @@ export class LevelScene extends Phaser.Scene {
     this.sfx('pop', 0.9);
     this.sfx('creature', 0.6);
     this.addScore(CREATURE_POINTS, x, y - 20, '#ffffff', true);
-    this.wakeAround(x, y, 200);
+    this.wakeAll();
 
     const left = this.pieces.filter((p) => p.kind === 'creature' && !p.dead).length;
     if (left === 0 && this.state !== 'over' && this.state !== 'finale') this.finale(x, y);
