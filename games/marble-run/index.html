@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:," />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Marble Run</title>
+    <style>
+      html:root { --bg: #bfe3f2; --shade: #4b2d73; --gold: #ffd23f; }
+      body { overflow: hidden; }
+      #stage { position: fixed; inset: 0; touch-action: none; }
+      .hud { position: fixed; z-index: 4; pointer-events: none; color: #fff; font-family: 'Kenney Bold', sans-serif;
+        text-shadow: 0 3px 0 var(--shade), 0 -2px 0 var(--shade), 2px 0 0 var(--shade), -2px 0 0 var(--shade); }
+      #title { top: 10px; left: 50%; transform: translateX(-50%); font-size: clamp(22px, 4.5vw, 34px); white-space: nowrap; text-align: center; }
+      #title small { display: block; font-size: 0.55em; color: var(--gold); }
+      #toast { top: 30%; left: 50%; transform: translate(-50%, -50%); font-size: clamp(18px, 3.5vw, 26px); opacity: 0;
+        transition: opacity 0.3s; text-align: center; width: min(90vw, 560px); }
+      #toast.show { opacity: 1; }
+      #dock { position: fixed; z-index: 5; left: 0; right: 0; bottom: 0; padding: 8px 10px 10px; display: grid; gap: 8px;
+        background: linear-gradient(to top, rgba(40, 20, 70, 0.55), rgba(40, 20, 70, 0)); }
+      #actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+      #actions .btn { font-size: 16px; }
+      #drop { background: #2fb36b; font-size: 19px !important; padding-left: 22px; padding-right: 22px; }
+      #palette { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 6px; scrollbar-width: thin; justify-content: safe center; }
+      #palette button { flex: 0 0 auto; width: 76px; padding: 4px 2px 6px; display: grid; justify-items: center; gap: 2px;
+        font-size: 10.5px; line-height: 1.1; background: #6b4aa8; }
+      #palette button img { width: 48px; height: 48px; image-rendering: auto; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.25)); }
+      #palette button.nope { animation: nope 0.35s; background: #a84a6b; }
+      @keyframes nope { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+      @media (max-width: 700px) {
+        #title { top: 56px; }
+        #actions .btn { font-size: 13px; padding: 7px 10px; }
+        #drop { font-size: 15px !important; }
+        #palette button { width: 64px; font-size: 9.5px; }
+        #palette button img { width: 40px; height: 40px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage"></div>
+    <div id="title" class="hud">Marble Run<small id="count">build a run, then drop the marbles</small></div>
+    <div id="toast" class="hud"></div>
+    <div id="dock">
+      <div id="actions">
+        <button id="drop" class="btn">Drop marbles</button>
+        <button id="undo" class="btn">Undo</button>
+        <button id="surprise" class="btn">Surprise me</button>
+        <button id="clear" class="btn">Clear</button>
+      </div>
+      <div id="palette"></div>
+    </div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

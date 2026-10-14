@@ -1,0 +1,14 @@
+{
+  "title": "Marble Run",
+  "description": "Snap track together piece by piece (drops, spirals, U-turns, bumps and wiggles), then drop a stream of marbles and watch them race to the finish. No way to lose; hit Surprise me for a random run.",
+  "thumbnail": "3D assets/Marble Kit/Sample.png",
+  "assets": [
+    "3D assets/Marble Kit/Models/GLB format/{bump-solid-a,curve-solid,curve-solid-large,end-hole-rounded,end-rounded,funnel,helix-half-left,helix-half-right,helix-quarter-left,helix-quarter-right,marble-high,ramp-end-solid-a,ramp-end-solid-b,ramp-end-solid-c,ramp-long-solid-a,ramp-long-solid-b,ramp-long-solid-c,ramp-start-solid-a,ramp-start-solid-b,ramp-start-solid-c,s-curve-left,s-curve-right,straight,support-color-single-bottom,support-color-single-middle,tree,tree-large,tree-tall,wave-solid-b}.glb",
+    "3D assets/Marble Kit/Models/GLB format/Textures/colormap.png",
+    "3D assets/Marble Kit/Previews/{bump-solid-a,curve-solid,curve-solid-large,end-hole-rounded,funnel,helix-half-left,helix-half-right,helix-quarter-left,helix-quarter-right,ramp-end-solid-a,ramp-end-solid-b,ramp-end-solid-c,ramp-long-solid-a,ramp-long-solid-b,ramp-long-solid-c,ramp-start-solid-a,ramp-start-solid-b,ramp-start-solid-c,s-curve-left,s-curve-right,straight,wave-solid-b}.png",
+    "Audio/Impact Sounds/Audio/impactGlass_light_00[0-4].ogg",
+    "Audio/Interface Sounds/Audio/{drop_001,drop_002,drop_003,drop_004,back_001,back_002,error_004,confirmation_001}.ogg",
+    "Audio/Retro Sounds 2/Audio/coin[1-3].ogg",
+    "Audio/Music Loops/Loops/Wacky Waiting.ogg"
+  ]
+}

@@ -18,6 +18,7 @@ Small, instantly fun browser games, each built around one [Kenney](https://kenne
 | <img src="docs/screenshots/sokoban.webp" width="240" alt="Sokoban"> | **[Sokoban](https://toys.projectz.co.nz/games/sokoban/)**<br>Push every crate onto its spot across twelve warehouse puzzles, some with colour-matched crates. Unlimited undo, and coins for matching par. | Sokoban Pack |
 | <img src="docs/screenshots/tilt-maze.webp" width="240" alt="Tilt Maze"> | **[Tilt Maze](https://toys.projectz.co.nz/games/tilt-maze/)**<br>Tilt the board to roll a ball home past holes, spinners and lasers, with a key to find and three stars per level. Tilt your phone, use the arrow keys or drag. | Rolling Ball Assets |
 | <img src="docs/screenshots/minigolf.webp" width="240" alt="Minigolf"> | **[Minigolf](https://toys.projectz.co.nz/games/minigolf/)**<br>Nine 3D holes floating on a pond, with castles, a windmill, ramps, bumps and a gap to clear. Drag back from the ball to putt, and mind the water. | Minigolf Kit |
+| <img src="docs/screenshots/marble-run.webp" width="240" alt="Marble Run"> | **[Marble Run](https://toys.projectz.co.nz/games/marble-run/)**<br>Snap track together piece by piece (drops, spirals, U-turns, bumps and wiggles), then drop a stream of marbles and watch them race down. Or hit Surprise me for a random run. | Marble Kit |
 
 More are on the way. [`CATALOG.md`](CATALOG.md) has a game idea for every pack in the bundle, and [`PLAN.md`](PLAN.md) tracks what's being built.
 

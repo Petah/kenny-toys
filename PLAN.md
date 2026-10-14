@@ -61,7 +61,7 @@ Status: ✅ done · 🚧 in progress · ⬜ idea
 
 | Status | Game | Kit | Pitch |
 |---|---|---|---|
-| ⬜ | Marble Run | Marble Kit | Snap track pieces together, drop marbles. Sandbox, no fail state. |
+| ✅ | Marble Run | Marble Kit | Snap pieces onto the end of the run from a palette (each piece's ports are found from its mesh in `ports.ts`), then drop marbles. Sandbox with Undo, Clear and Surprise me; the run is saved. `scripts/check-pieces.ts` prints what each palette item does; `scripts/check-runs.ts` rolls marbles down random runs and fails under 90% reaching the end. |
 | ✅ | Minigolf | Minigolf Kit | 9 holes floating on a pond: drag back to putt (or arrow keys and space), splash penalties, scorecard and best round. The first 3D game: `shared/three.ts` and `shared/audio.ts` are the base for the rest. Holes are tile grids checked by `games/minigolf/scripts/check-holes.ts`, which plays them with the game's own Rapier physics to confirm each can be sunk within par. |
 | ⬜ | Coaster Builder | Coaster Kit | Lay track, then ride it first-person. |
 | ⬜ | Pet Stack | Cube Pets | Drop cube animals onto a wobbling tower. |
