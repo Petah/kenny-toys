@@ -24,11 +24,11 @@ export class TitleScene extends Phaser.Scene {
     drawBackdrop(this, 'grass');
     this.decorate();
 
-    const title = this.add.text(WIDTH / 2, 118, 'TOPPLE', { ...TEXT, fontSize: '120px', strokeThickness: 18 }).setOrigin(0.5);
+    const title = this.add.text(WIDTH / 2, 102, 'TOPPLE', { ...TEXT, fontSize: '104px', strokeThickness: 18 }).setOrigin(0.5);
     title.setScale(0);
     this.tweens.add({ targets: title, scale: 1, duration: 500, ease: 'Back.easeOut' });
     this.tweens.add({ targets: title, angle: { from: -2, to: 2 }, yoyo: true, repeat: -1, duration: 1400, ease: 'Sine.easeInOut' });
-    this.add.text(WIDTH / 2, 205, 'pull back, let go, knock the aliens off', { ...TEXT, fontSize: '28px', strokeThickness: 7 }).setOrigin(0.5);
+    this.add.text(WIDTH / 2, 216, 'pull back, let go, knock the aliens off', { ...TEXT, fontSize: '28px', strokeThickness: 7 }).setOrigin(0.5);
 
     const progress = loadProgress();
     const cols = 4;
