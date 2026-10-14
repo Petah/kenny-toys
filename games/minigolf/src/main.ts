@@ -1,9 +1,9 @@
 import { Sounds } from '@shared/audio';
+import { readGlb, type Triangles } from '@shared/glb';
 import { setupGamePage } from '@shared/shell';
 import { createRenderer, loadGlb, shareMaterials } from '@shared/three';
 import { MODEL_DIR, SFX } from './assets.ts';
 import { MinigolfGame } from './game.ts';
-import { readGlb, type Triangles } from './glb.ts';
 import { initPhysics } from './physics.ts';
 import { ALL_MODELS, type Models } from './scene3d.ts';
 

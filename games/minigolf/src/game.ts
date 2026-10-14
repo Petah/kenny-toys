@@ -3,7 +3,7 @@ import type { Sounds } from '@shared/audio';
 import { load, save } from '@shared/storage';
 import { MUSIC } from './assets.ts';
 import { parseCourse, type Course } from './course.ts';
-import type { Triangles } from './glb.ts';
+import type { Triangles } from '../../../shared/glb.ts';
 import { HOLES } from './holes.ts';
 import { Hud, relative, scoreName } from './hud.ts';
 import { BALL_RADIUS, CoursePhysics, STEP, type BallEvent } from './physics.ts';

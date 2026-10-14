@@ -12,7 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { HOLES } from '../src/holes.ts';
 import { checkCourse, parseCourse, turnSide, type Course, type Side } from '../src/course.ts';
-import { readGlb } from '../src/glb.ts';
+import { readGlb } from '../../../shared/glb.ts';
 import { CoursePhysics, initPhysics } from '../src/physics.ts';
 
 const ROOT = process.env.KENNEY_ROOT ?? path.resolve(import.meta.dirname, '../../../../Kenney Game Assets All-in-1 3.7.0');

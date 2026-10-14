@@ -1,6 +1,6 @@
 import RAPIER from '@dimforge/rapier3d-compat';
 import { FLOOR, type Course, type Placement } from './course.ts';
-import type { Triangles } from './glb.ts';
+import type { Triangles } from '../../../shared/glb.ts';
 
 /**
  * The course as one static triangle mesh, and the ball. Rapier, no three.js, so the hole
