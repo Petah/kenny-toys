@@ -25,7 +25,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Development Essentials | *(utility)*: checkerboards, noise and UV textures for prototyping. |
 | ✅ | Domino Pack (+ Boardgame Pack) | **Domino Chain**: draw lines of dominoes through the pawns on a card table, tip the first, watch the chain reaction. |
 | ✅ | Donuts (+ Splat Pack) | **Donut Splat**: Fruit Ninja with donuts; slices paint glaze splats. |
-| | Emote Pack | **Emote Match**: match-3 with speech-bubble emotes. |
+| ✅ | Emote Pack | **Emote Pop**: bubble shooter with speech-balloon emotes. |
 | | Explosion Pack | *(effects)*: explosion flipbooks for any game; toy idea: **Boom Box** click-to-detonate. |
 | ✅ | Fish Pack | **Fish Frenzy**: eat smaller fish to grow, avoid bigger ones. |
 | | Flag Pack | **Flag Quiz**: guess the country from its flag, against the clock. |

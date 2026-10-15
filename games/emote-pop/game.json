@@ -1,0 +1,15 @@
+{
+  "title": "Emote Pop",
+  "description": "A bubble shooter with speech-balloon emotes. Aim off the walls to match three of a kind and pop them, and cut whole clumps loose to drop them for big points. Miss too often and the wall comes down a row.",
+  "thumbnail": "2D assets/Emote Pack/Preview.png",
+  "assets": [
+    "2D assets/Emote Pack/Vector/emotes_vector.svg",
+    "Audio/Foley Sounds/Audio/Woosh/woosh[1-3].ogg",
+    "Audio/Interface Sounds/Audio/{tick_001,tick_002,drop_001,drop_002,drop_003,switch_001,switch_002,glitch_001,click_001,click_002}.ogg",
+    "Audio/Impact Sounds/Audio/{impactSoft_medium_00[0-2],impactGeneric_light_00[0-3],impactMining_00[0-2],impactPunch_heavy_00[0-1],impactPlank_medium_00[0-1]}.ogg",
+    "Audio/Digital Audio/Audio/powerUp2.ogg",
+    "Audio/Music Jingles/Audio (Hit)/jingles-hit_{04,09,13}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{go,game_over,new_highscore,level_up,power_up}.ogg",
+    "Audio/Music Loops/Loops/Cheerful Annoyance.ogg"
+  ]
+}
