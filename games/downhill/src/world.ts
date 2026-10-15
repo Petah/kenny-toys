@@ -155,7 +155,7 @@ export function makeChunk(seed: number, cx: number, cy: number): ChunkData {
 
   const count = Math.round(6 + Math.min(12, metres / 70) + rand() * 3);
   for (let i = 0, tries = 0; i < count && tries < count * 6; tries++) {
-    const p = spot(4);
+    const p = spot(9);
     if (!free(p.x, p.y, 8)) continue;
     let pick = rand() * SCENERY_TOTAL;
     const [kind] = SCENERY.find(([, w]) => (pick -= w) < 0) ?? SCENERY[0];

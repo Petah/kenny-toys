@@ -1,26 +1,33 @@
 import * as Phaser from 'phaser';
-import { FONT_BODY, FONT_HEADING } from '@shared/fonts';
 import { playSfx } from '@shared/phaser';
 import { load, submitHighScore } from '@shared/storage';
-import { makeButton } from '@shared/ui';
-import { PIXEL_FONT, SFX, SKI, T, TILE, createFont, preloadAssets, type Voice } from './assets';
+import { PIXEL_FONT, RAMP, SFX, SKI, T, TILE, createFont, createRamp, preloadAssets, type Voice } from './assets';
 import { CHUNK, KINDS, makeChunk, touches, type ChunkData, type Gate, type Thing } from './world';
 
 type State = 'title' | 'playing' | 'caught' | 'over';
 
 /** The skier stands this far down the screen, leaving most of it for what's coming. */
-const SKIER_AT = 0.3;
+const SKIER_AT = 0.25;
 /** Heading is the angle from straight downhill; this is as far round as the skis turn. */
 const MAX_HEADING = 1.4;
-const TURN_RATE = 5;
-const KEY_TURN_RATE = 2.6;
+/** Holding a key turns the skis this far; letting go swings them back downhill. */
+const KEY_HEADING = 1.05;
+/** How quickly the skis swing round, in radians a second, easing in at the end. */
+const TURN_RATE = 6;
+const TURN_EASE = 14;
 /** How much more the pointer's sideways offset counts than its distance down the screen. */
 const POINTER_SWING = 1.6;
-/** Pull down the slope, in pixels a second squared. It grows the further down you get. */
-const GRAVITY = 210;
-const GRAVITY_GROWTH = 0.06;
-const GRAVITY_MAX = 360;
-const DRAG = 1;
+/** Top speed pointing straight downhill, in pixels a second. It grows the further down you get. */
+const TOP_SPEED = 230;
+const TOP_SPEED_GROWTH = 0.07;
+const TOP_SPEED_MAX = 380;
+/** Across the slope you keep this share of it, so traversing round trees doesn't stall you. */
+const TRAVERSE_SPEED = 0.5;
+const TUCK = 1.15;
+/** How fast speed closes on its target: picking up, slowing down and digging in to brake. */
+const ACCEL = 1.5;
+const SLOW = 2.5;
+const BRAKE = 4;
 /** Seconds lying in the snow after a crash, then blinking and passing through things. */
 const CRASH_S = 0.9;
 const GHOST_S = 0.8;
@@ -39,13 +46,9 @@ const YETI_MAX = 340;
 /** He's never more than this many screens behind. */
 const YETI_LEASH = 1.6;
 const OVERHEAD = 1e7;
-
-const TEXT: Phaser.Types.GameObjects.Text.TextStyle = {
-  fontFamily: FONT_HEADING,
-  color: '#ffffff',
-  stroke: '#3a2836',
-  align: 'center',
-};
+const INK = 0x3a2836;
+const PALE = 0xa8c4e6;
+const GOLD = 0xffd23f;
 
 interface Chunk {
   data: ChunkData;
@@ -74,6 +77,8 @@ export class SlopeScene extends Phaser.Scene {
   private y = 60;
   private heading = 0;
   private target = 0;
+  private braking = false;
+  private tucking = false;
   private speed = 0;
   private air?: { t: number; dur: number; height: number };
   private crashT = 0;
@@ -112,6 +117,7 @@ export class SlopeScene extends Phaser.Scene {
 
   create() {
     createFont(this);
+    createRamp(this);
     this.makeTextures();
     this.world = this.add.layer();
     this.ui = this.add.layer();
@@ -131,7 +137,7 @@ export class SlopeScene extends Phaser.Scene {
       emitting: false,
     });
     this.spray.setDepth(OVERHEAD - 10);
-    this.shadow = this.add.image(0, 0, SKI, this.frames[0]).setOrigin(0.5, 1).setTint(0x9fb6d3).setAlpha(0.6).setVisible(false);
+    this.shadow = this.add.image(0, 0, 'shadow').setOrigin(0.5, 1).setVisible(false);
     this.skier = this.add.image(0, 0, SKI, this.frames[0]).setOrigin(0.5, 1);
     this.world.add([this.snow, this.tracks, this.spray, this.shadow, this.skier]);
 
@@ -145,9 +151,9 @@ export class SlopeScene extends Phaser.Scene {
     this.setHudVisible(false);
 
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
-      if (!p.wasTouch || p.isDown) this.steerByPointer = true;
+      if (!p.wasTouch || p.isDown) this.steerByPointer = this.state === 'playing';
     });
-    this.input.on('pointerdown', () => (this.steerByPointer = true));
+    this.input.on('pointerdown', () => (this.steerByPointer = this.state === 'playing'));
     const kb = this.input.keyboard;
     if (kb) {
       kb.addCapture('SPACE,LEFT,RIGHT,UP,DOWN');
@@ -178,30 +184,25 @@ export class SlopeScene extends Phaser.Scene {
     }
     tex.refresh();
     this.make.graphics({}, false).fillStyle(0xffffff).fillRect(0, 0, 2, 2).generateTexture('flake', 2, 2).destroy();
+    // A pixel oval under the skier in the air.
+    this.make.graphics({}, false).fillStyle(0xb7cbe4).fillRect(2, 0, 8, 3).fillRect(0, 1, 12, 1).generateTexture('shadow', 12, 3).destroy();
   }
 
   /** Whole-number zoom keeps every pixel the same size: two on most screens, more on big ones. */
   private layout() {
     const { width: w, height: h } = this.scale;
-    this.zoom = Math.max(1, Math.floor(Math.min(h / 280, w / 180)));
+    // Zoomed out enough to see a good second or so of slope ahead.
+    this.zoom = Math.max(1, Math.floor(Math.min(h / 400, w / 260)));
     // Single pixels are too small to play on anything but a short phone screen.
     if (this.zoom === 1 && h >= 480 && w >= 360) this.zoom = 2;
     this.cameras.main.setSize(w, h).setZoom(this.zoom);
     this.uiCam.setSize(w, h);
-    // Centred on wide screens; top right on narrow ones, clear of the "All toys" link.
-    const narrow = w < 700;
-    const s = narrow ? 2 : Math.max(2, this.zoom + 1);
-    const x = narrow ? w - 12 : w / 2;
-    const ox = narrow ? 1 : 0.5;
-    this.distText.setScale(s).setOrigin(ox, 0).setPosition(x, 10);
-    this.styleText.setScale(Math.max(1, s - 1)).setOrigin(ox, 0).setPosition(x, 14 + TILE * s);
+    // Top right, clear of the "All toys" link and of the strip above the skier where the yeti comes from.
+    const s = w < 700 ? 2 : this.zoom + 1;
+    this.distText.setScale(s).setOrigin(1, 0).setPosition(w - 14, 12);
+    this.styleText.setScale(Math.max(2, s - 1)).setOrigin(1, 0).setPosition(w - 14, 16 + TILE * s);
     this.followCamera(0, true);
     this.rebuildOverlay?.();
-  }
-
-  /** UI scale for cards and buttons: 1 at 1280×720, smaller on phones. */
-  private get k() {
-    return Math.min(this.scale.height / 720, this.scale.width / 480);
   }
 
   private setHudVisible(on: boolean) {
@@ -237,7 +238,7 @@ export class SlopeScene extends Phaser.Scene {
     const chunk: Chunk = { data, parts: [], sprites: new Map(), chairs: [] };
     const add = <O extends Phaser.GameObjects.GameObject>(o: O) => (chunk.parts.push(o), o);
     for (const t of data.things) {
-      const img = add(this.add.image(t.x, t.y, SKI, KINDS[t.kind].frame).setOrigin(0.5, 1).setDepth(t.y));
+      const img = add((t.kind === 'ramp' ? this.add.image(t.x, t.y, RAMP) : this.add.image(t.x, t.y, SKI, KINDS[t.kind].frame)).setOrigin(0.5, 1).setDepth(t.y));
       chunk.sprites.set(t, img);
       if (t.kind === 'tower') {
         add(this.add.image(t.x, t.y - TILE, SKI, T.lift.pole).setOrigin(0.5, 1).setDepth(t.y));
@@ -291,28 +292,42 @@ export class SlopeScene extends Phaser.Scene {
     if (this.state === 'title' || (this.state === 'over' && this.canRestart)) this.startGame();
   }
 
-  /** Where the skier wants to point: at the mouse or finger, or turned by the keys. */
-  private steer(dt: number) {
+  /**
+   * Where the skier wants to point, and whether they're braking. Keys turn the skis while held and
+   * let them swing back downhill after; up digs in to brake and down tucks for speed. The mouse or a
+   * held finger points the way, and pointing above the skier turns them across the slope to stop.
+   */
+  private steer() {
     const k = this.keys;
     const left = !!k && (k.left.isDown || k.a.isDown);
     const right = !!k && (k.right.isDown || k.d.isDown);
     const down = !!k && (k.down.isDown || k.s.isDown);
     const up = !!k && (k.up.isDown || k.w.isDown);
+    this.braking = this.tucking = false;
     if (left || right || down || up) {
       this.steerByPointer = false;
-      if (down) this.target = 0;
-      else if (up) this.target = (this.target < 0 ? -1 : 1) * MAX_HEADING;
-      this.target = Phaser.Math.Clamp(this.target + ((right ? 1 : 0) - (left ? 1 : 0)) * KEY_TURN_RATE * dt, -MAX_HEADING, MAX_HEADING);
+      const side = (right ? 1 : 0) - (left ? 1 : 0);
+      this.target = side * (up ? MAX_HEADING : KEY_HEADING);
+      this.braking = up;
+      this.tucking = down && !up;
       return;
     }
     const p = this.input.activePointer;
-    if (!this.steerByPointer || (p.wasTouch && !p.isDown)) return;
+    if (!this.steerByPointer || (p.wasTouch && !p.isDown)) {
+      // Nothing held: let the skis run back downhill.
+      this.target = 0;
+      return;
+    }
     const at = this.cameras.main.getWorldPoint(p.x, p.y);
     const dx = at.x - this.x;
-    const dy = at.y - (this.y - 8);
-    // Pointing at or above the skier turns the skis right across the slope, which stops them.
-    // Sideways counts extra, so a tall phone screen still steers sharply.
-    this.target = dy < 6 ? Math.sign(dx || 1) * MAX_HEADING : Phaser.Math.Clamp(Math.atan2(dx * POINTER_SWING, dy), -MAX_HEADING, MAX_HEADING);
+    const dy = at.y - (this.y - 6);
+    if (dy < 0) {
+      this.braking = true;
+      this.target = Math.sign(dx || this.heading || 1) * MAX_HEADING;
+    } else {
+      // Measured from a little way below the skier, so a pointer close by doesn't swing them wildly.
+      this.target = Math.abs(dx) < 3 ? 0 : Phaser.Math.Clamp(Math.atan2(dx * POINTER_SWING, Math.max(dy, 40)), -MAX_HEADING, MAX_HEADING);
+    }
   }
 
   // ---- Game flow ---------------------------------------------------------------------------
@@ -326,6 +341,7 @@ export class SlopeScene extends Phaser.Scene {
     this.x = 0;
     this.y = 60;
     this.heading = this.target = 0;
+    this.braking = this.tucking = false;
     this.speed = 0;
     this.air = undefined;
     this.crashT = this.ghostT = 0;
@@ -339,7 +355,7 @@ export class SlopeScene extends Phaser.Scene {
     this.yeti?.sprite.destroy();
     this.yeti = undefined;
     this.yetiArrow.setVisible(false);
-    this.skier.setFrame(this.frames[0]).setVisible(true).setAngle(0).setAlpha(1).setScale(1);
+    this.skier.setFrame(this.frames[0]).setVisible(true).setAngle(0).setAlpha(1);
     this.followCamera(0, true);
     this.updateChunks();
   }
@@ -353,6 +369,7 @@ export class SlopeScene extends Phaser.Scene {
     this.distText.setText('0M');
     this.styleText.setText('');
     this.setHudVisible(true);
+    this.steerByPointer = false;
     this.banner('GO!');
     this.voice('go');
     this.music ??= this.sound.add('music', { loop: true, volume: 0.3 });
@@ -369,6 +386,8 @@ export class SlopeScene extends Phaser.Scene {
     this.skier.setVisible(false);
     this.shadow.setVisible(false);
     this.music?.stop();
+    this.setHudVisible(false);
+    this.yetiArrow.setVisible(false);
     playSfx(this, SFX, 'roar', { volume: 0.7, detune: -200 });
     playSfx(this, SFX, 'rumble', { volume: 0.5 });
     this.cameras.main.shake(300, 0.01);
@@ -402,7 +421,7 @@ export class SlopeScene extends Phaser.Scene {
   update(time: number, delta: number) {
     const dt = Math.min(delta / 1000, 1 / 30);
     if (this.state === 'playing') {
-      this.steer(dt);
+      this.steer();
       // Small steps, so a fast skier on a slow frame can't skip clean through a tree trunk,
       // and a 60Hz screen plays the same as a 120Hz one.
       const steps = Math.ceil(dt * 120 - 1e-6);
@@ -434,11 +453,13 @@ export class SlopeScene extends Phaser.Scene {
     this.ghostT = Math.max(0, this.ghostT - dt);
 
     const before = this.heading;
-    const turn = Phaser.Math.Clamp(this.target - this.heading, -TURN_RATE * dt, TURN_RATE * dt);
+    const turn = Phaser.Math.Clamp((this.target - this.heading) * TURN_EASE * dt, -TURN_RATE * dt, TURN_RATE * dt);
     if (!this.air) this.heading += turn;
-    const gravity = Math.min(GRAVITY_MAX, GRAVITY + this.metres * GRAVITY_GROWTH);
-    // Pointing downhill speeds you up; across the slope, drag wins and you slow to a stop.
-    this.speed = Math.max(0, this.speed + (gravity * Math.cos(this.heading) - DRAG * this.speed) * dt);
+    // Speed closes on a target set by where the skis point: fastest straight down, slower across.
+    const top = Math.min(TOP_SPEED_MAX, TOP_SPEED + this.metres * TOP_SPEED_GROWTH);
+    const want = this.braking && !this.air ? 0 : top * (TRAVERSE_SPEED + (1 - TRAVERSE_SPEED) * Math.cos(this.heading)) * (this.tucking ? TUCK : 1);
+    const rate = this.braking ? BRAKE : this.speed < want ? ACCEL : SLOW;
+    this.speed += (want - this.speed) * Math.min(1, rate * dt);
     const prevY = this.y;
     this.x += Math.sin(this.heading) * this.speed * dt;
     this.y += Math.cos(this.heading) * this.speed * dt;
@@ -451,7 +472,7 @@ export class SlopeScene extends Phaser.Scene {
       // Carving hard throws up snow, and makes a crunch now and then.
       const carve = Math.abs(this.heading - before) / dt;
       // About 60 or 120 flakes a second, whatever the frame rate.
-      if (carve > 1.5 && this.speed > 70 && Math.random() < dt * 60) {
+      if ((carve > 1.5 || this.braking) && this.speed > 60 && Math.random() < dt * 60) {
         this.spray.emitParticleAt(this.x - Math.sin(this.heading) * 3, this.y - 1, carve > 3 ? 2 : 1);
         if (time - this.lastCarve > 260) {
           this.lastCarve = time;
@@ -586,11 +607,10 @@ export class SlopeScene extends Phaser.Scene {
     const push = this.speed < 90 && !crashed && this.state === 'playing';
     this.skier.setFrame(this.frames[push ? Math.floor(this.time.now / 180) % 2 : 0]);
     this.skier.setPosition(x, y - Math.round(air * (this.air?.height ?? 0))).setDepth(y + (this.air ? OVERHEAD / 2 : 0));
-    this.skier.setScale(1 + air * 0.35);
-    // The pack only draws the skier from the front, so lean them into the turn instead.
-    if (!crashed && !this.tweens.isTweening(this.skier)) this.skier.setAngle(Phaser.Math.RadToDeg(-this.heading) * 0.45);
+    // Turned only in quarter turns, so the pixels stay square; upright unless tumbling.
+    this.skier.setAngle(crashed ? Math.round(this.skier.angle / 90) * 90 : 0);
     this.skier.setAlpha(this.ghostT > 0 && Math.floor(this.time.now / 80) % 2 ? 0.35 : 1);
-    this.shadow.setVisible(!!this.air).setPosition(x, y).setFrame(this.skier.frame.name).setDepth(y - 0.5).setScale(1 - air * 0.2, 0.4);
+    this.shadow.setVisible(!!this.air).setPosition(x, y + 1).setDepth(y - 0.5);
   }
 
   private followCamera(dt: number, snap: boolean) {
@@ -649,11 +669,12 @@ export class SlopeScene extends Phaser.Scene {
     // An arrow at the top edge while he's above the screen.
     const cam = this.cameras.main;
     const top = cam.worldView.y;
-    const off = yeti.y - 16 < top;
+    const off = yeti.y < top + 4;
     this.yetiArrow.setVisible(off);
     if (off) {
+      const sc = Math.max(1, this.zoom - 1);
       const sx = Phaser.Math.Clamp((yeti.x - cam.worldView.x) * cam.zoom, 40, this.scale.width - 40);
-      this.yetiArrow.setPosition(sx, 70 + Math.sin(time / 120) * 3).setScale(Math.max(1, this.zoom - 1));
+      this.yetiArrow.setPosition(Math.round(sx), Math.round(20 * sc + 6 + Math.sin(time / 120) * 3)).setScale(sc);
     }
   }
 
@@ -677,15 +698,15 @@ export class SlopeScene extends Phaser.Scene {
     const cam = this.cameras.main;
     const sx = (this.x - cam.worldView.x) * cam.zoom;
     const sy = (this.y - 20 - cam.worldView.y) * cam.zoom;
-    const label = this.add.bitmapText(sx, sy, PIXEL_FONT, text).setOrigin(0.5, 1).setTint(tint).setScale(Math.max(1, this.zoom - 1));
+    const label = this.add.bitmapText(Math.round(sx), Math.round(sy), PIXEL_FONT, text).setOrigin(0.5, 1).setTint(tint).setScale(this.zoom);
     this.ui.add(label);
-    this.tweens.add({ targets: label, y: sy - 40, alpha: 0, duration: 800, ease: 'Quad.easeOut', onComplete: () => label.destroy() });
+    this.tweens.add({ targets: label, y: Math.round(sy) - 16 * this.zoom, alpha: 0, duration: 800, ease: 'Quad.easeOut', onUpdate: () => (label.y = Math.round(label.y)), onComplete: () => label.destroy() });
   }
 
   private banner(text: string) {
     const { width: w, height: h } = this.scale;
     const s = Math.max(3, this.zoom * 2);
-    const label = this.add.bitmapText(w / 2, h * 0.45, PIXEL_FONT, text).setOrigin(0.5).setScale(0);
+    const label = this.add.bitmapText(Math.round(w / 2), Math.round(h * 0.5), PIXEL_FONT, text).setOrigin(0.5).setScale(0);
     this.ui.add(label);
     this.tweens.add({ targets: label, scale: s, duration: 300, ease: 'Back.easeOut' });
     this.tweens.add({ targets: label, alpha: 0, duration: 400, delay: 900, onComplete: () => label.destroy() });
@@ -712,86 +733,172 @@ export class SlopeScene extends Phaser.Scene {
     this.overlayTimers.push(this.time.delayedCall(ms, fn));
   }
 
-  private button(x: number, y: number, label: string, onClick: () => void) {
-    return makeButton(this, x, y, label, onClick, { textStyle: TEXT, color: 0xe2483d, onPress: () => playSfx(this, SFX, 'click') }).parts;
+  /** Pixel letters at a whole-number scale, so every letter pixel is the same size. */
+  private text(x: number, y: number, str: string, scale: number, tint = 0xffffff) {
+    return this.add.bitmapText(Math.round(x), Math.round(y), PIXEL_FONT, str).setScale(scale).setTint(tint);
   }
 
-  /** Like the shared fitCard, but for a pixel-font title, which keeps its own scale. */
-  private fitCard(card: Phaser.GameObjects.Container, width: number, title: Phaser.GameObjects.BitmapText) {
-    const w = this.scale.width;
-    card.setScale(Math.min(this.k, (w - 24) / width));
-    const room = (w - 32) / card.scale;
-    if (title.width > room) title.setScale(title.scale * (room / title.width));
+  /** Text size for cards: bigger on big screens, never so big a line won't fit a phone. */
+  private get unit() {
+    const { width: w, height: h } = this.scale;
+    return w >= 1000 && h >= 700 ? 3 : 2;
+  }
+
+  /** A chunky pixel panel with notched corners, in screen pixels. */
+  private panel(x: number, y: number, w: number, h: number, u: number, fill: number, edge?: number) {
+    const g = this.add.graphics();
+    const box = (dx: number, dy: number, bw: number, bh: number, c: number, a = 1) =>
+      g.fillStyle(c, a).fillRect(x + dx + u, y + dy, bw - 2 * u, bh).fillRect(x + dx, y + dy + u, bw, bh - 2 * u);
+    box(0, u, w, h, 0x000000, 0.25);
+    if (edge !== undefined) {
+      box(-u, -u, w + 2 * u, h + 2 * u, edge);
+    }
+    box(0, 0, w, h, fill);
+    return g;
+  }
+
+  /** A pixel button centred on (x, y): returns its parts and its height. */
+  private button(x: number, y: number, label: string, u: number, onClick: () => void) {
+    const s = u + 1;
+    const text = this.text(x, y, label, s).setOrigin(0.5);
+    const w = Math.round(text.width + 14 * s);
+    const h = Math.round(text.height + 6 * s);
+    const left = Math.round(x - w / 2);
+    const top = Math.round(y - h / 2);
+    const face = this.panel(left, top, w, h, u, 0xe2483d, INK);
+    face.fillStyle(0xf47a6e).fillRect(left + u, top, w - 2 * u, u);
+    const zone = this.add.zone(x, y, w + 8, h + 8).setInteractive({ useHandCursor: true });
+    zone.on('pointerover', () => face.setAlpha(0.85));
+    zone.on('pointerout', () => (face.setAlpha(1), face.setY(0), text.setY(Math.round(y))));
+    zone.on('pointerdown', () => (face.setY(u), text.setY(Math.round(y) + u)));
+    zone.on('pointerup', () => {
+      face.setY(0);
+      text.setY(Math.round(y));
+      playSfx(this, SFX, 'click');
+      onClick();
+    });
+    return { parts: [face, text, zone] as Phaser.GameObjects.GameObject[], h };
+  }
+
+  /** The tallest whole-number scale at which a line of pixel text fits the screen width, up to `max`. */
+  private fitScale(str: string, max: number, margin = 32) {
+    const probe = this.add.bitmapText(0, 0, PIXEL_FONT, str);
+    const w = probe.width;
+    probe.destroy();
+    return Phaser.Math.Clamp(Math.floor((this.scale.width - margin) / w), 1, max);
+  }
+
+  /** Where cards start: just below the skier, so they never cover him or the yeti. */
+  private cardTop(height: number) {
+    const { height: h } = this.scale;
+    const below = Math.round(h * SKIER_AT + 14 * this.zoom);
+    return Math.max(8, Math.min(Math.max(below, Math.round((h - height) / 2)), h - 12 - height));
   }
 
   private showTitle() {
     this.state = 'title';
     this.setOverlay(() => {
-      const { width: w, height: h } = this.scale;
-      const card = this.add.container(w / 2, h * 0.6);
-      const panel = this.add.graphics();
-      panel.fillStyle(0x3a2836, 0.55).fillRoundedRect(-290, -110, 580, 140, 24);
-      const title = this.add.bitmapText(0, -170, PIXEL_FONT, 'DOWNHILL').setOrigin(0.5).setScale(6);
-      this.tweens.add({ targets: title, y: -176, duration: 1200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      const { width: w } = this.scale;
+      const cx = Math.round(w / 2);
+      const u = this.unit;
       const touch = window.matchMedia('(pointer: coarse)').matches;
-      const tag = this.add
-        .text(0, -78, touch ? 'Hold your finger where you want to go' : 'Point the mouse where you want to go, or use the arrow keys', {
-          ...TEXT,
-          fontFamily: FONT_BODY,
-          fontSize: '22px',
-          strokeThickness: 7,
-          wordWrap: { width: 520 },
-        })
-        .setOrigin(0.5);
-      const yeti = this.add.image(-150, -6, SKI, T.yeti.roar).setScale(3);
-      this.tweens.add({ targets: yeti, y: -12, duration: 220, yoyo: true, repeat: -1 });
-      const warn = this.add
-        .text(-110, -6, '...and keep ahead of the yeti!', { ...TEXT, fontFamily: FONT_BODY, fontSize: '22px', color: '#ffd0cc', strokeThickness: 7 })
-        .setOrigin(0, 0.5);
-      const play = this.button(0, 80, 'SKI!', () => this.startGame());
-      const parts: Phaser.GameObjects.GameObject[] = [panel, title, tag, yeti, warn, ...play];
-      if (this.best) parts.push(this.add.text(0, 148, `best ${this.best}`, { ...TEXT, fontSize: '24px', color: '#ffd23f', strokeThickness: 7 }).setOrigin(0.5));
-      card.add(parts);
-      this.fitCard(card, 620, title);
-      return [card];
+      const ts = this.fitScale('DOWNHILL', u * 2 + 1);
+      const how = touch ? 'HOLD YOUR FINGER WHERE YOU WANT TO GO' : 'POINT THE MOUSE WHERE YOU WANT TO GO. OR STEER WITH THE ARROW KEYS';
+      const lineH = TILE * u;
+      // Phaser wraps on the scaled width.
+      const maxLine = Math.min(w - 64, 300 * u);
+
+      const title = this.text(cx, 0, 'DOWNHILL', ts).setOrigin(0.5, 0);
+      const tag = this.text(cx, 0, how, u).setOrigin(0.5, 0).setCenterAlign().setMaxWidth(maxLine);
+      const warn = this.text(0, 0, 'KEEP AHEAD OF THE YETI!', u, 0xffd0cc).setOrigin(0, 0);
+      const yeti = this.add.image(0, 0, SKI, T.yeti.roar).setScale(u).setOrigin(0, 0);
+      // The warning and its yeti as one centred row; wrapped under it on narrow screens.
+      const rowW = yeti.displayWidth + 4 * u + warn.width;
+      const stacked = rowW > w - 64;
+      if (stacked) warn.setMaxWidth(maxLine).setCenterAlign();
+
+      const pad = 8 * u;
+      const panelW = Math.round(Math.max(tag.width, stacked ? warn.width : rowW) + pad * 2);
+      const tagH = tag.height;
+      const warnH = stacked ? yeti.displayHeight + 4 * u + warn.height : Math.max(yeti.displayHeight, warn.height);
+      const panelH = pad + tagH + 6 * u + warnH + pad;
+      const btnH = 22 * (u + 1);
+      const total = title.height + 8 * u + panelH + 10 * u + btnH + (this.best ? 8 * u + lineH : 0);
+
+      let y = this.cardTop(total);
+      title.setY(y);
+      this.tweens.add({ targets: title, y: y - u, duration: 600, yoyo: true, repeat: -1, ease: 'Stepped' });
+      y += title.height + 8 * u;
+      const panelX = Math.round(cx - panelW / 2);
+      const panel = this.panel(panelX, y, panelW, panelH, u, INK, undefined).setAlpha(0.9);
+      tag.setY(y + pad);
+      const warnTop = y + pad + tagH + 6 * u;
+      if (stacked) {
+        yeti.setPosition(Math.round(cx - yeti.displayWidth / 2), warnTop);
+        warn.setPosition(Math.round(cx - warn.width / 2), warnTop + yeti.displayHeight + 4 * u);
+      } else {
+        const left = Math.round(cx - rowW / 2);
+        yeti.setPosition(left, warnTop + Math.round((warnH - yeti.displayHeight) / 2));
+        warn.setPosition(left + yeti.displayWidth + 4 * u, warnTop + Math.round((warnH - warn.height) / 2));
+      }
+      this.tweens.add({ targets: yeti, y: yeti.y - 2 * u, duration: 220, yoyo: true, repeat: -1, ease: 'Stepped' });
+      y += panelH + 10 * u;
+      const play = this.button(cx, y + btnH / 2, 'SKI!', u, () => this.startGame());
+      y += btnH + 8 * u;
+      const parts: Phaser.GameObjects.GameObject[] = [title, panel, tag, yeti, warn, ...play.parts];
+      if (this.best) parts.push(this.text(cx, y, `BEST ${this.best}`, u, GOLD).setOrigin(0.5, 0));
+      return parts;
     });
   }
 
   private showGameOver(record: boolean, animate: boolean) {
     this.setOverlay(() => {
       const { width: w, height: h } = this.scale;
-      const card = this.add.container(w / 2, h * 0.5);
-      const title = this.add.bitmapText(0, -190, PIXEL_FONT, 'GOBBLED!').setOrigin(0.5).setScale(5).setTint(0xffd0cc);
-      const panel = this.add.graphics();
-      panel.fillStyle(0x000000, 0.25).fillRoundedRect(-240, -122, 480, 236, 26);
-      panel.fillStyle(0x3a2836, 0.92).fillRoundedRect(-240, -130, 480, 236, 26);
-      panel.lineStyle(4, 0xa8c4e6, 1).strokeRoundedRect(-240, -130, 480, 236, 26);
-      const label = { ...TEXT, fontSize: '22px', color: '#a8c4e6', strokeThickness: 0 };
-      const big = { ...TEXT, fontSize: '52px', color: '#ffd23f', strokeThickness: 8 };
-      const small = { ...big, fontSize: '30px', color: '#ffffff' };
-      const scoreLabel = this.add.text(0, -108, 'SCORE', label).setOrigin(0.5);
-      const scoreNum = this.add.text(0, -60, animate ? '0' : `${this.score}`, big).setOrigin(0.5);
-      const cols = [
-        ['DISTANCE', `${this.metres}m`],
+      const cx = Math.round(w / 2);
+      const u = this.unit;
+      const ts = this.fitScale('GOBBLED!', u * 2 + 1);
+      const title = this.text(cx, 0, 'GOBBLED!', ts, 0xffd0cc).setOrigin(0.5, 0);
+      const pad = 8 * u;
+      const rowH = TILE * u + 4 * u;
+      const bigS = u + 1;
+      const panelW = Math.min(w - 32, 150 * u);
+      const panelH = pad + TILE * bigS + 6 * u + rowH * 3 + pad - 4 * u;
+      const btnH = 22 * (u + 1);
+      const total = title.height + 8 * u + panelH + 12 * u + btnH;
+
+      let y = this.cardTop(total);
+      title.setY(y);
+      y += title.height + 8 * u;
+      const left = Math.round(cx - panelW / 2);
+      const right = left + panelW;
+      const panel = this.panel(left, y, panelW, panelH, u, INK, PALE);
+      // Score on its own line, then the sums that make it: label on the left, value on the right.
+      let ry = y + pad;
+      const scoreLabel = this.text(left + pad, ry + (TILE * bigS - TILE * u) / 2, 'SCORE', u, PALE);
+      const scoreNum = this.text(right - pad, ry, animate ? '0' : `${this.score}`, bigS, GOLD).setOrigin(1, 0);
+      ry += TILE * bigS + 6 * u;
+      const rows = [
+        ['DISTANCE', `${this.metres}M`],
         ['STYLE', `${this.style}`],
         ['BEST', `${this.best}`],
       ].flatMap(([name, value], i) => [
-        this.add.text((i - 1) * 150, 2, name, label).setOrigin(0.5),
-        this.add.text((i - 1) * 150, 40, value, small).setOrigin(0.5),
+        this.text(left + pad, ry + i * rowH, name, u, PALE),
+        this.text(right - pad, ry + i * rowH, value, u).setOrigin(1, 0),
       ]);
-      const newTag = record ? this.add.text(170, -82, 'NEW!', { ...TEXT, fontSize: '26px', color: '#e2483d', stroke: '#ffffff', strokeThickness: 6 }).setOrigin(0.5).setAngle(14) : undefined;
-      const again = this.button(0, 170, 'AGAIN', () => this.startGame());
-      const parts = [title, panel, scoreLabel, scoreNum, ...cols, newTag, ...again];
-      card.add(parts.filter((p): p is NonNullable<typeof p> => !!p));
-      this.fitCard(card, 500, title);
+      const newTag = record ? this.text(right - pad - rows[5].width - 6 * u, ry + 2 * rowH, 'NEW!', u, 0xff6a5c).setOrigin(1, 0) : undefined;
+      y += panelH + 12 * u;
+      const again = this.button(cx, y + btnH / 2, 'AGAIN', u, () => this.startGame());
+      const shade = this.add.rectangle(0, 0, w, h, INK, 0.3).setOrigin(0);
+      const parts = [shade, title, panel, scoreLabel, scoreNum, ...rows, ...(newTag ? [newTag] : []), ...again.parts];
       if (!animate) {
         this.canRestart = true;
-        return [this.add.rectangle(0, 0, w, h, 0x3a2836, 0.3).setOrigin(0), card];
+        return parts;
       }
 
-      again.forEach((p) => (p as unknown as Phaser.GameObjects.Components.Visible).setVisible(false));
+      again.parts.forEach((p) => (p as unknown as Phaser.GameObjects.Components.Visible).setVisible(false));
       newTag?.setVisible(false);
-      this.tweens.add({ targets: title, y: { from: -380, to: -190 }, duration: 450, ease: 'Back.easeOut' });
+      const titleY = title.y;
+      this.tweens.add({ targets: title, y: { from: titleY - 200, to: titleY }, duration: 450, ease: 'Back.easeOut', onUpdate: () => (title.y = Math.round(title.y)) });
       const steps = 24;
       for (let i = 1; i <= steps; i++) {
         this.later(400 + i * 40, () => {
@@ -801,22 +908,19 @@ export class SlopeScene extends Phaser.Scene {
       }
       const reveal = 400 + steps * 40 + 250;
       this.later(reveal, () => {
-        this.tweens.add({ targets: scoreNum, scale: { from: 1.4, to: 1 }, duration: 300, ease: 'Back.easeOut' });
         if (newTag) {
           newTag.setVisible(true);
-          this.tweens.add({ targets: newTag, scale: { from: 0, to: 1 }, duration: 300, ease: 'Back.easeOut' });
+          this.tweens.add({ targets: newTag, alpha: { from: 0, to: 1 }, duration: 300, yoyo: true, repeat: 2 });
           playSfx(this, SFX, 'record', { volume: 0.6, detune: 0 });
           this.later(500, () => this.voice('new_highscore'));
         }
       });
       this.later(reveal + 400, () => {
-        again.forEach((p) => (p as unknown as Phaser.GameObjects.Components.Visible).setVisible(true));
+        again.parts.forEach((p) => (p as unknown as Phaser.GameObjects.Components.Visible).setVisible(true));
         this.canRestart = true;
         this.rebuildOverlay = () => this.showGameOver(record, false);
       });
-      // Dim the slope behind the card so it reads.
-      const shade = this.add.rectangle(0, 0, w, h, 0x3a2836, 0.3).setOrigin(0);
-      return [shade, card];
+      return parts;
     });
   }
 }
