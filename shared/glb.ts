@@ -43,18 +43,36 @@ function multiply(a: Mat, b: Mat): Mat {
  * drawn but shouldn't collide, like the windmill's blades.
  */
 export function readGlb(buffer: ArrayBuffer, skip: string[] = []): Triangles {
+  const positions: number[] = [];
+  const indices: number[] = [];
+  visitMeshes(buffer, skip, (_name, pos, idx) => {
+    const base = positions.length / 3;
+    for (const v of pos) positions.push(v);
+    for (const i of idx) indices.push(base + i);
+  });
+  return { positions: new Float32Array(positions), indices: new Uint32Array(indices) };
+}
+
+/** Each mesh node's vertices on their own, placed by the node's transform: one convex part each. */
+export function readGlbParts(buffer: ArrayBuffer): { name: string; positions: Float32Array }[] {
+  const parts: { name: string; positions: Float32Array }[] = [];
+  visitMeshes(buffer, [], (name, pos) => parts.push({ name, positions: new Float32Array(pos) }));
+  return parts;
+}
+
+function visitMeshes(buffer: ArrayBuffer, skip: string[], onMesh: (name: string, positions: number[], indices: number[]) => void) {
   const view = new DataView(buffer);
   const jsonLength = view.getUint32(12, true);
   const json = JSON.parse(new TextDecoder().decode(new Uint8Array(buffer, 20, jsonLength))) as GltfJson;
   const binStart = 20 + jsonLength + 8;
 
-  const positions: number[] = [];
-  const indices: number[] = [];
   const visit = (index: number, parent: Mat) => {
     const node = json.nodes[index];
     if (node.name && skip.includes(node.name)) return;
     const world = multiply(parent, compose(node.translation, node.rotation, node.scale));
     if (node.mesh !== undefined) {
+      const positions: number[] = [];
+      const indices: number[] = [];
       for (const prim of json.meshes[node.mesh].primitives) {
         const base = positions.length / 3;
         const pa = json.accessors[prim.attributes.POSITION];
@@ -84,10 +102,10 @@ export function readGlb(buffer: ArrayBuffer, skip: string[] = []): Triangles {
           indices.push(base + (size === 1 ? view.getUint8(at) : size === 2 ? view.getUint16(at, true) : view.getUint32(at, true)));
         }
       }
+      onMesh(node.name ?? '', positions, indices);
     }
     for (const child of node.children ?? []) visit(child, world);
   };
   const identity = compose();
   for (const root of json.scenes[json.scene ?? 0].nodes) visit(root, identity);
-  return { positions: new Float32Array(positions), indices: new Uint32Array(indices) };
 }

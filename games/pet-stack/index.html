@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:," />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Pet Stack</title>
+    <style>
+      html:root { --bg: #9fd8f2; --ink: #ffffff; --shade: #2c5a3a; --gold: #ffe27a; }
+      body { overflow: hidden; user-select: none; -webkit-user-select: none; }
+      #stage { position: fixed; inset: 0; touch-action: none; }
+      .hud { position: fixed; z-index: 4; pointer-events: none; color: var(--ink); font-family: 'Kenney Bold', sans-serif;
+        text-shadow: 0 3px 0 var(--shade), 0 -2px 0 var(--shade), 2px 0 0 var(--shade), -2px 0 0 var(--shade); }
+      #height { top: 68px; left: 16px; font-size: clamp(40px, 8vw, 64px); line-height: 1; }
+      #height small { font-size: 0.42em; margin-left: 3px; }
+      #best { top: calc(72px + clamp(40px, 8vw, 64px)); left: 18px; font-size: clamp(14px, 2.6vw, 18px); color: var(--gold); }
+      #hearts { top: 12px; right: 14px; display: flex; gap: 4px; }
+      #hearts img { width: 40px; height: 40px; transition: transform 0.3s, filter 0.3s, opacity 0.3s; }
+      #hearts img.lost { filter: grayscale(1) brightness(0.8); opacity: 0.45; transform: scale(0.75); }
+      #next { top: 62px; right: 14px; display: flex; align-items: center; gap: 8px; font-size: 16px; }
+      #next img { width: 54px; height: 54px; border-radius: 14px; background: rgba(44, 90, 58, 0.35); border: 3px solid rgba(255,255,255,0.7); }
+      #ring { position: fixed; z-index: 4; width: 44px; height: 44px; margin: -22px 0 0 -22px; pointer-events: none; display: none; }
+      #ring circle { fill: none; stroke-width: 6; }
+      #ring .back { stroke: rgba(44, 90, 58, 0.45); }
+      #ring .front { stroke: #fff; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke 0.2s; }
+      #ring.hurry .front { stroke: #ff7a6a; }
+      #bestline { position: fixed; z-index: 3; pointer-events: none; display: none; font: 13px 'Kenney Bold', sans-serif; color: var(--gold);
+        text-shadow: 0 2px 0 var(--shade), 0 -1px 0 var(--shade), 1px 0 0 var(--shade), -1px 0 0 var(--shade); transform: translate(6px, -50%); }
+      #banner { top: 30%; left: 50%; transform: translate(-50%, -50%) scale(0.4); font-size: clamp(44px, 11vw, 92px); opacity: 0;
+        transition: transform 0.3s cubic-bezier(.2,1.6,.4,1), opacity 0.2s; white-space: nowrap; text-align: center; }
+      #banner.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      #banner small { display: block; font-size: 0.34em; color: var(--gold); }
+      #touch { position: fixed; inset: auto 0 0 0; z-index: 5; display: none; justify-content: space-between; padding: 0 14px 18px; pointer-events: none; }
+      @media (pointer: coarse) { #touch { display: flex; } }
+      .tb { pointer-events: auto; width: 74px; height: 74px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.75); background: rgba(44,90,58,0.4);
+        color: #fff; font: 34px 'Kenney Bold', sans-serif; display: grid; place-items: center; touch-action: none; padding: 0; }
+      .tb.down { background: rgba(255,255,255,0.45); }
+      #hint { bottom: 18px; left: 50%; transform: translateX(-50%); font-size: clamp(13px, 2.4vw, 17px); color: var(--gold); white-space: nowrap; transition: opacity 0.6s; }
+      @media (pointer: coarse) { #hint { bottom: 104px; } }
+      .card { position: fixed; z-index: 6; inset: 0; display: none; place-items: center; background: rgba(30, 60, 40, 0.35); }
+      .card.show { display: grid; }
+      .card > div { background: #4f9a3d; border: 4px solid rgba(255,255,255,0.45); border-radius: 22px; padding: 22px 26px 18px; color: #fff;
+        font-family: 'Kenney Bold', sans-serif; text-align: center; max-width: 94vw; box-shadow: 0 10px 0 rgba(0,0,0,0.25); }
+      .card h2 { margin: 0 0 10px; font-size: clamp(30px, 7vw, 46px); font-weight: normal; }
+      .card .stats { display: flex; gap: 22px; justify-content: center; margin: 0 0 12px; }
+      .card .stats div { font-size: clamp(30px, 7vw, 42px); }
+      .card .stats small { display: block; font-size: 14px; color: var(--gold); }
+      .card p { margin: 0 0 14px; color: var(--gold); }
+      .card .btn { font-size: 22px; padding: 12px 34px; }
+      #title { background: none; place-items: end center; padding-bottom: 7vh; }
+      #title > div { background: none; border: none; box-shadow: none; text-shadow: 0 5px 0 var(--shade), 0 -3px 0 var(--shade), 3px 0 0 var(--shade), -3px 0 0 var(--shade); }
+      #title h1 { margin: 0 0 14px; font-size: clamp(52px, 12vw, 104px); font-weight: normal; line-height: 1; }
+      #title .btn { font-size: 26px; padding: 14px 44px; text-shadow: none; }
+      #title p { margin: 12px 0 0; }
+      #title .keys { font-family: 'Kenney Future', sans-serif; font-size: 14px; color: #fff; }
+      @media (pointer: coarse) { #title .keys.mouse { display: none; } }
+      @media (pointer: fine) { #title .keys.touch { display: none; } }
+      body.on-title .hud, body.on-title #touch, body.on-title #ring, body.on-title #bestline { display: none !important; }
+    </style>
+  </head>
+  <body class="on-title">
+    <div id="stage"></div>
+    <div id="height" class="hud">0<small>cm</small></div>
+    <div id="best" class="hud"></div>
+    <div id="hearts" class="hud"></div>
+    <div id="next" class="hud">NEXT <img id="next-icon" alt="" /></div>
+    <svg id="ring" viewBox="0 0 44 44"><circle class="back" cx="22" cy="22" r="18" /><circle class="front" cx="22" cy="22" r="18" /></svg>
+    <div id="bestline">BEST</div>
+    <div id="banner" class="hud"></div>
+    <div id="hint" class="hud"></div>
+    <div id="touch"><button id="t-left" class="tb" aria-label="Turn left">⟲</button><button id="t-right" class="tb" aria-label="Turn right">⟳</button></div>
+    <div id="over" class="card"><div>
+      <h2 id="over-title">Tower down!</h2>
+      <div class="stats"><div><span id="over-height">0</span><small>CM HIGH</small></div><div><span id="over-pets">0</span><small>PETS STACKED</small></div></div>
+      <p id="over-note"></p>
+      <button id="over-go" class="btn">Again</button>
+    </div></div>
+    <div id="title" class="card show"><div>
+      <h1>PET STACK</h1>
+      <button id="title-play" class="btn">Stack!</button>
+      <p id="title-best"></p>
+      <p class="keys mouse">Move to aim · click to drop · right-click, wheel or arrows to turn</p>
+      <p class="keys touch">Drag to aim · let go to drop · buttons turn the pet</p>
+    </div></div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
