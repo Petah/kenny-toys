@@ -16,9 +16,11 @@ const TEXT: Phaser.Types.GameObjects.Text.TextStyle = {
 };
 
 /** Seconds between drops at level 1, each level's speed-up, and the fastest it gets. */
-const DROP_START = 1.8;
-const DROP_SPEEDUP = 0.88;
+const DROP_START = 3;
+const DROP_SPEEDUP = 0.9;
 const DROP_FASTEST = 0.7;
+/** The level stones start dropping from. */
+const STONE_LEVEL = 4;
 /** Words a level lasts. */
 const WORDS_PER_LEVEL = 5;
 const START_ROWS = 4;
@@ -232,7 +234,7 @@ export class WellScene extends Phaser.Scene {
       this.nextWild = false;
       return this.well.make('wild');
     }
-    const stoneChance = Math.min(0.22, Math.max(0, (this.level - 2) * 0.05));
+    const stoneChance = Math.min(0.2, Math.max(0, (this.level - STONE_LEVEL + 1) * 0.04));
     const roll = Math.random();
     if (roll < stoneChance) return this.well.make('stone');
     if (roll < stoneChance + 0.06) return this.well.make('double');
@@ -425,7 +427,7 @@ export class WellScene extends Phaser.Scene {
       this.level = level;
       this.levelText.setText(`LEVEL ${level}`);
       this.time.delayedCall(500, () => {
-        this.banner(`LEVEL ${level}`, level === 3 ? 'stones! make words next to them' : 'faster!');
+        this.banner(`LEVEL ${level}`, level === STONE_LEVEL ? 'stones! make words next to them' : 'faster!');
         playSfx(this, SFX, 'level', { volume: 0.5, detune: 0 });
         this.voice('level_up');
       });
