@@ -169,7 +169,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Space Station Kit | **Station Escape**: first-person escape through station corridors. |
 | | Survival Kit | **Campfire**: gather wood and keep the fire alive through the night. |
 | | Tower Defense Kit / (Classic) | **3D Tower Defense**: place towers along a 3D path. |
-| | Toy Car Kit | **Bedroom RC**: drift a toy car around a block-built track. |
+| ✅ | Toy Car Kit | **Toy Kart**: kart racing on toy track with item boxes, bananas and coins. |
 | 🎯 | Train Kit | **Train Switcher**: flip switches to route trains to matching stations. |
 | | Watercraft Pack | **Boat Race**: race boats around buoys. |
 | | Weapon Pack / Medieval Weapons (Early access) | **Armory**: inspect-and-spin weapon showcase. |
