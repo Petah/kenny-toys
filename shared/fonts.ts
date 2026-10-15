@@ -15,3 +15,9 @@ export function loadKenneyFonts(): Promise<void> {
   ).then(() => undefined);
   return loading;
 }
+
+/** Registers one more font from `Other/Fonts` (declare the file in game.json's assets). */
+export async function loadKenneyFont(family: string): Promise<void> {
+  const face = new FontFace(family, `url("${kenney(`Other/Fonts/${family}.ttf`)}")`);
+  document.fonts.add(await face.load());
+}

@@ -1,0 +1,14 @@
+{
+  "title": "Blackjack",
+  "description": "Fifteen hands at a pixel card table. Start with $500, bet, hit, stand, double or split, and walk away with as many chips as you can. Blackjack pays 3 to 2.",
+  "thumbnail": "2D assets/Playing Cards Pack/Preview.png",
+  "assets": [
+    "2D assets/Playing Cards Pack/Tilesheet/cardsLarge_tilemap_packed.png",
+    "Other/Fonts/Kenney Pixel.ttf",
+    "Audio/Casino Audio/Audio/{card-slide-[1-8],card-place-[1-4],card-fan-[1-2],card-shove-[1-4],card-shuffle,chip-lay-[1-3],chips-stack-[1-6],chips-collide-[1-4],chips-handle-[1-6]}.ogg",
+    "Audio/Interface Sounds/Audio/{click_001,click_002,tick_001,tick_002,error_004,error_006}.ogg",
+    "Audio/Music Jingles/Audio (Saxophone)/jingles-saxophone_{00,04,05,09}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{final_round,game_over,new_highscore,you_win,its_a_tie}.ogg",
+    "Audio/Music Loops/Loops/Swinging Pants.ogg"
+  ]
+}

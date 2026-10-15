@@ -12,6 +12,10 @@ export interface PixelFontOptions {
   offset: { x: number; y: number };
   /** Colours to swap, as [from, to] RGB pairs, so letters lifted from one pack match another. */
   recolor?: [number, number][];
+  /** How many columns neighbouring letters share; 2 for the Kenney sheets' two-pixel outline. */
+  overlap?: number;
+  /** How far a space moves along. */
+  space?: number;
 }
 
 /**
@@ -71,11 +75,11 @@ export function createPixelFont(scene: Phaser.Scene, key: string, opts: PixelFon
     c.centerX = Math.floor(c.width / 2);
     c.u0 = c.x / tex.width;
     c.u1 = (c.x + c.width) / tex.width;
-    c.xAdvance = c.width - 2;
+    c.xAdvance = c.width - (opts.overlap ?? 2);
   }
   // Sheets have no space: borrow a letter's entry with nothing to draw.
   const any = Object.values(chars)[0];
-  chars[32] = { ...any, width: 0, height: 0, xAdvance: 5 };
+  chars[32] = { ...any, width: 0, height: 0, xAdvance: opts.space ?? 5 };
   scene.cache.bitmapFont.add(key, entry);
 }
 
@@ -88,4 +92,65 @@ interface Glyph {
   xAdvance: number;
   u0: number;
   u1: number;
+}
+
+export interface FontSheetOptions {
+  /** A loaded CSS font family, drawn at a size where its pixels land on whole pixels (Kenney Pixel at 16). */
+  family: string;
+  size: number;
+  chars: string;
+  /** Square cell each glyph is drawn into, outline included. */
+  tile: number;
+  charsPerRow: number;
+  /** Baseline within a cell. */
+  baseline: number;
+  /** Draws a one-pixel outline of this colour round each glyph. */
+  outline?: string;
+}
+
+/**
+ * Draws a pixel TTF's glyphs into a sheet texture with hard edges (canvas text comes out
+ * antialiased, so alpha is thresholded) for `createPixelFont` to trim into a bitmap font.
+ */
+export function drawFontSheet(scene: Phaser.Scene, key: string, opts: FontSheetOptions) {
+  if (scene.textures.exists(key)) return;
+  const { tile, charsPerRow, chars } = opts;
+  const rows = Math.ceil(chars.length / charsPerRow);
+  const tex = scene.textures.createCanvas(key, charsPerRow * tile, rows * tile)!;
+  const ctx = tex.context;
+  ctx.font = `${opts.size}px "${opts.family}"`;
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#fff';
+  [...chars].forEach((ch, i) => ctx.fillText(ch, (i % charsPerRow) * tile + 1, Math.floor(i / charsPerRow) * tile + opts.baseline));
+  const img = ctx.getImageData(0, 0, tex.width, tex.height);
+  const px = img.data;
+  const on = new Uint8Array(tex.width * tex.height);
+  for (let i = 0; i < on.length; i++) on[i] = px[i * 4 + 3] >= 128 ? 1 : 0;
+  const edge = opts.outline ? Phaser.Display.Color.HexStringToColor(opts.outline) : undefined;
+  for (let y = 0; y < tex.height; y++) {
+    for (let x = 0; x < tex.width; x++) {
+      const i = y * tex.width + x;
+      const o = i * 4;
+      if (on[i]) {
+        px.set([255, 255, 255, 255], o);
+        continue;
+      }
+      // Outline pixels touch a glyph pixel side-on or corner to corner, within the same cell.
+      let near = false;
+      if (edge) {
+        for (let dy = -1; dy <= 1 && !near; dy++) {
+          for (let dx = -1; dx <= 1 && !near; dx++) {
+            const nx = x + dx;
+            const ny = y + dy;
+            if (Math.floor(nx / tile) !== Math.floor(x / tile) || Math.floor(ny / tile) !== Math.floor(y / tile)) continue;
+            near = on[ny * tex.width + nx] === 1;
+          }
+        }
+      }
+      if (near && edge) px.set([edge.red, edge.green, edge.blue, 255], o);
+      else px[o + 3] = 0;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  tex.refresh();
 }

@@ -83,7 +83,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Platformer Pack Medieval | **Castle Run**: knight platformer through a castle. |
 | | Platformer Pack Nautical | **Pier Jumper**: platformer across docks, boats and buoys. |
 | | Platformer Pack Remastered | **Remastered Run**: polished one-level platformer showcase. |
-| 🎯 | Playing Cards Pack | **Blackjack** or **Solitaire**: quick card table (pair with Casino Audio). |
+| ✅ | Playing Cards Pack | **Blackjack**: fifteen hands from $500 at a pixel card table. |
 | | Prototype Textures | *(utility)*: grid textures for blockouts. |
 | | Puzzle Pack 1 / 2 | **Gem Swap**: match-3 with the pack's coloured gems. |
 | | Racing Pack | **Top-Down Racer**: Micro Machines-style track racing. |
