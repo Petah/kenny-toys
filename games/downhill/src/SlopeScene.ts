@@ -240,6 +240,8 @@ export class SlopeScene extends Phaser.Scene {
     for (const t of data.things) {
       const img = add((t.kind === 'ramp' ? this.add.image(t.x, t.y, RAMP) : this.add.image(t.x, t.y, SKI, KINDS[t.kind].frame)).setOrigin(0.5, 1).setDepth(t.y));
       chunk.sprites.set(t, img);
+      const top = (KINDS[t.kind] as { top?: number }).top;
+      if (top !== undefined) img.setData('top', add(this.add.image(t.x, t.y - TILE, SKI, top).setOrigin(0.5, 1).setDepth(t.y)));
       if (t.kind === 'tower') {
         add(this.add.image(t.x, t.y - TILE, SKI, T.lift.pole).setOrigin(0.5, 1).setDepth(t.y));
         add(this.add.image(t.x, t.y - TILE * 2, SKI, T.lift.top).setOrigin(0.5, 1).setDepth(OVERHEAD + 1));
@@ -583,7 +585,11 @@ export class SlopeScene extends Phaser.Scene {
     playSfx(this, SFX, 'ouch', { volume: 0.35 });
     this.spray.emitParticleAt(this.x, this.y - 4, 10);
     this.cameras.main.shake(120, 0.004);
-    if (img && !this.tweens.isTweening(img)) this.tweens.add({ targets: img, angle: { from: -12, to: 12 }, duration: 70, yoyo: true, repeat: 2, onComplete: () => img.setAngle(0) });
+    // A shake on whole pixels, top and trunk together.
+    if (img && !this.tweens.isTweening(img)) {
+      const parts = [img, img.getData('top') as Phaser.GameObjects.Image | undefined].filter((p) => !!p);
+      this.tweens.add({ targets: parts, x: img.x + 1, duration: 50, yoyo: true, repeat: 2, ease: 'Stepped' });
+    }
     // The tumble: spin over and land flat.
     this.tweens.killTweensOf(this.skier);
     this.skier.setAngle(0);

@@ -15,6 +15,8 @@ const START_CLEAR = { x: 110, y: 230 };
 
 export interface Kind {
   frame: number;
+  /** The tile above it, for the tall trees, which stand two tiles high. */
+  top?: number;
   /** Hit box above the ground point (bottom middle of the tile). */
   hit: { w: number; h: number };
   /** What touching it does. */
@@ -22,11 +24,9 @@ export interface Kind {
 }
 
 export const KINDS = {
-  pine: { frame: 6, hit: { w: 6, h: 5 }, effect: 'crash' },
-  pine2: { frame: 30, hit: { w: 6, h: 5 }, effect: 'crash' },
-  tree: { frame: 18, hit: { w: 6, h: 5 }, effect: 'crash' },
-  dead: { frame: 7, hit: { w: 6, h: 4 }, effect: 'crash' },
-  dead2: { frame: 19, hit: { w: 6, h: 4 }, effect: 'crash' },
+  pine: { frame: 18, top: 6, hit: { w: 6, h: 5 }, effect: 'crash' },
+  smallPine: { frame: 30, hit: { w: 6, h: 5 }, effect: 'crash' },
+  dead: { frame: 19, top: 7, hit: { w: 6, h: 4 }, effect: 'crash' },
   twigs: { frame: 31, hit: { w: 10, h: 4 }, effect: 'crash' },
   rock: { frame: 81, hit: { w: 12, h: 6 }, effect: 'crash' },
   snowman: { frame: 69, hit: { w: 8, h: 5 }, effect: 'crash' },
@@ -84,11 +84,9 @@ function hash(...ns: number[]) {
 }
 
 const SCENERY: [KindName, number][] = [
-  ['pine', 5],
-  ['pine2', 5],
-  ['tree', 2],
-  ['dead', 1.5],
-  ['dead2', 1],
+  ['pine', 6],
+  ['smallPine', 5],
+  ['dead', 2],
   ['twigs', 1.2],
   ['rock', 1.5],
   ['snowman', 0.4],
