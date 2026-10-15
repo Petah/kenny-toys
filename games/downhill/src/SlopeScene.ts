@@ -29,6 +29,11 @@ const TUCK = 1.15;
 const ACCEL = 1.5;
 const SLOW = 2.5;
 const BRAKE = 4;
+/** A push on the poles: a kick of speed, a while skiing faster than the slope alone allows, and a rest. */
+const PUSH_KICK = 35;
+const PUSH_BOOST = 0.15;
+const PUSH_S = 0.45;
+const PUSH_REST_S = 0.35;
 /** Seconds lying in the snow after a crash, then blinking and passing through things. */
 const CRASH_S = 0.9;
 const GHOST_S = 0.8;
@@ -46,7 +51,7 @@ const MILESTONE_M = 250;
 const YETI_AT_M = 600;
 const YETI_SPEED = 0.7;
 const YETI_ACCEL = 0.004;
-const YETI_MAX = 1.05;
+const YETI_MAX = 1.2;
 /** He's never more than this many screens behind. */
 const YETI_LEASH = 1.6;
 const OVERHEAD = 1e7;
@@ -90,6 +95,9 @@ export class SlopeScene extends Phaser.Scene {
   private camX = 0;
   private lastCarve = 0;
   private sprayAngle = 90;
+  private sprayVel = { x: 0, y: 0 };
+  private pushT = 0;
+  private pushRest = 0;
   private deep = false;
   private steerByPointer = false;
   private keys?: Record<'left' | 'right' | 'up' | 'down' | 'a' | 'd' | 'w' | 's', Phaser.Input.Keyboard.Key>;
@@ -136,10 +144,12 @@ export class SlopeScene extends Phaser.Scene {
     // Snow thrown off the skis, mostly to the outside of a turn.
     this.spray = this.add.particles(0, 0, 'flake', {
       frame: ['fleck', 'fleck', 'clump'],
-      lifespan: { min: 350, max: 800 },
-      speed: { min: 40, max: 170 },
-      angle: { onEmit: () => this.sprayAngle + Phaser.Math.Between(-28, 28) },
-      gravityY: 160,
+      lifespan: { min: 350, max: 750 },
+      // Flakes keep most of the skier's speed, so the spray streams along the line of the turn
+      // instead of being left behind; on top, they fly out at the spray angle.
+      speedX: { onEmit: () => this.flakeVelocity().x },
+      speedY: { onEmit: () => this.sprayVel.y },
+      gravityY: 40,
       alpha: { start: 1, end: 0, ease: 'Quad.easeIn' },
       // White to show on the deep snow, blue-grey to show on the piste.
       tint: [0xffffff, 0xffffff, 0xdbe7f5, 0xb4cbe6, 0x9db6d8],
@@ -162,12 +172,15 @@ export class SlopeScene extends Phaser.Scene {
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
       if (!p.wasTouch || p.isDown) this.steerByPointer = this.state === 'playing';
     });
-    this.input.on('pointerdown', () => (this.steerByPointer = this.state === 'playing'));
+    this.input.on('pointerdown', () => {
+      this.steerByPointer = this.state === 'playing';
+      this.push();
+    });
     const kb = this.input.keyboard;
     if (kb) {
       kb.addCapture('SPACE,LEFT,RIGHT,UP,DOWN');
       this.keys = kb.addKeys({ left: 'LEFT', right: 'RIGHT', up: 'UP', down: 'DOWN', a: 'A', d: 'D', w: 'W', s: 'S' }) as typeof this.keys;
-      for (const key of ['SPACE', 'ENTER']) kb.on(`keydown-${key}`, (e: KeyboardEvent) => !e.repeat && this.confirm());
+      for (const key of ['SPACE', 'ENTER']) kb.on(`keydown-${key}`, (e: KeyboardEvent) => !e.repeat && (this.state === 'playing' ? this.push() : this.confirm()));
     }
     this.scale.on('resize', () => this.layout());
 
@@ -306,6 +319,28 @@ export class SlopeScene extends Phaser.Scene {
 
   // ---- Input -------------------------------------------------------------------------------
 
+  /** A push on the poles: only on the snow, and not again straight away. */
+  private push() {
+    if (this.state !== 'playing' || this.crashT > 0 || this.air || this.pushRest > 0) return;
+    this.pushT = PUSH_S;
+    this.pushRest = PUSH_S + PUSH_REST_S;
+    this.speed = Math.min(this.speed + PUSH_KICK, this.topSpeed * (1 + PUSH_BOOST));
+    playSfx(this, SFX, 'whoosh', { volume: 0.25, detune: Phaser.Math.Between(-200, 200) });
+    // A kick of snow off the back of the skis.
+    this.sprayAngle = 270 - Phaser.Math.RadToDeg(this.heading);
+    this.spray.emitParticleAt(this.x, this.y - 1, 6);
+  }
+
+  /** A random flake velocity: the skier's, mostly, plus a throw at the spray angle. */
+  private flakeVelocity() {
+    const a = Phaser.Math.DegToRad(this.sprayAngle + Phaser.Math.Between(-25, 25));
+    const throwSpeed = Phaser.Math.Between(40, 140);
+    const carry = 0.75;
+    this.sprayVel.x = Math.sin(this.heading) * this.speed * carry + Math.cos(a) * throwSpeed;
+    this.sprayVel.y = Math.cos(this.heading) * this.speed * carry + Math.sin(a) * throwSpeed;
+    return this.sprayVel;
+  }
+
   private confirm() {
     if (this.state === 'title' || (this.state === 'over' && this.canRestart)) this.startGame();
   }
@@ -361,6 +396,7 @@ export class SlopeScene extends Phaser.Scene {
     this.heading = this.target = 0;
     this.braking = this.tucking = false;
     this.speed = 0;
+    this.pushT = this.pushRest = 0;
     this.air = undefined;
     this.crashT = this.ghostT = 0;
     this.camX = 0;
@@ -475,7 +511,10 @@ export class SlopeScene extends Phaser.Scene {
     // Speed closes on a target set by where the skis point: fastest straight down, slower across.
     this.deep = !this.air && !onPiste(this.seed, this.x, this.y);
     const top = this.topSpeed * (this.deep ? DEEP_SNOW : 1);
-    const want = this.braking && !this.air ? 0 : top * (TRAVERSE_SPEED + (1 - TRAVERSE_SPEED) * Math.cos(this.heading)) * (this.tucking ? TUCK : 1);
+    let want = this.braking && !this.air ? 0 : top * (TRAVERSE_SPEED + (1 - TRAVERSE_SPEED) * Math.cos(this.heading)) * (this.tucking ? TUCK : 1);
+    this.pushT = Math.max(0, this.pushT - dt);
+    this.pushRest = Math.max(0, this.pushRest - dt);
+    if (this.pushT > 0 && !this.braking) want = Math.max(want, top * (1 + PUSH_BOOST));
     const rate = this.braking ? BRAKE : this.speed < want ? ACCEL : SLOW;
     this.speed += (want - this.speed) * Math.min(1, rate * dt);
     const prevY = this.y;
@@ -506,9 +545,9 @@ export class SlopeScene extends Phaser.Scene {
       this.sprayAngle = 90 - Phaser.Math.RadToDeg(this.heading) + Phaser.Math.Between(-60, 60);
     } else if (carve > 0.6 && this.speed > 50) {
       rate = Math.min(900, 170 * carve) * fast;
-      // Thrown outwards from the turn and a little ahead.
+      // Thrown out sideways from the turn: away from the side the skis are turning towards.
       const along = 90 - Phaser.Math.RadToDeg(this.heading);
-      this.sprayAngle = along - Math.sign(turned) * 75;
+      this.sprayAngle = along + Math.sign(turned) * 80;
     } else if (this.deep && this.speed > 40) {
       rate = 70 * fast;
       this.sprayAngle = 270 + Phaser.Math.Between(-50, 50);
@@ -649,9 +688,11 @@ export class SlopeScene extends Phaser.Scene {
     const air = this.air ? Math.sin((Math.PI * this.air.t) / this.air.dur) : 0;
     const x = Math.round(this.x);
     const y = Math.round(this.y);
-    // Poles pushing when slow, tucked when fast.
-    const push = this.speed < 90 && !crashed && this.state === 'playing';
-    this.skier.setFrame(this.frames[push ? Math.floor(this.time.now / 180) % 2 : 0]);
+    // A push: poles planted, then swung back. Otherwise poles working when slow, tucked when fast.
+    let frame = 0;
+    if (this.pushT > 0 && !crashed) frame = this.pushT > PUSH_S / 2 ? 1 : 0;
+    else if (this.speed < 90 && !crashed && this.state === 'playing') frame = Math.floor(this.time.now / 180) % 2;
+    this.skier.setFrame(this.frames[frame]);
     this.skier.setPosition(x, y - Math.round(air * (this.air?.height ?? 0))).setDepth(y + (this.air ? OVERHEAD / 2 : 0));
     // Turned only in quarter turns, so the pixels stay square; upright unless tumbling.
     this.skier.setAngle(crashed ? Math.round(this.skier.angle / 90) * 90 : 0);
@@ -847,7 +888,9 @@ export class SlopeScene extends Phaser.Scene {
       const u = this.unit;
       const touch = window.matchMedia('(pointer: coarse)').matches;
       const ts = this.fitScale('DOWNHILL', u * 2 + 1);
-      const how = touch ? 'HOLD YOUR FINGER WHERE YOU WANT TO GO' : 'POINT THE MOUSE WHERE YOU WANT TO GO. OR STEER WITH THE ARROW KEYS';
+      const how = touch
+        ? 'HOLD YOUR FINGER WHERE YOU WANT TO GO. TAP TO PUSH OFF'
+        : 'POINT THE MOUSE WHERE YOU WANT TO GO. OR STEER WITH THE ARROW KEYS. CLICK OR SPACE TO PUSH OFF';
       const lineH = TILE * u;
       // Phaser wraps on the scaled width.
       const maxLine = Math.min(w - 64, 300 * u);
