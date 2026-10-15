@@ -1,0 +1,14 @@
+{
+  "title": "Word Drop",
+  "description": "Letter tiles rain into a well. Swipe through touching letters to spell words and clear them before any column overflows. Long words earn wildcards, red tiles double the score, and stones only break when you spell next to them.",
+  "thumbnail": "2D assets/Letter Tiles Redux/Preview.png",
+  "assets": [
+    "2D assets/Letter Tiles Redux/Tilesheet/tilesheet_Style{B,D,E,G,H,J}.{png,xml}",
+    "Audio/Interface Sounds/Audio/{select_00[1-4],back_001,confirmation_00[1-3],error_004,scratch_00[1-2],click_001,click_002,tick_001,tick_002,glitch_001}.ogg",
+    "Audio/Digital Audio/Audio/{pepSound[1-3],powerUp2}.ogg",
+    "Audio/Impact Sounds/Audio/{impactWood_light_00[0-4],impactPlank_medium_00[0-2],impactMining_00[0-2]}.ogg",
+    "Audio/Music Jingles/Audio (Pizzicato)/jingles-pizzicato_0[01].ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{go,game_over,new_highscore,level_up,power_up}.ogg",
+    "Audio/Music Loops/Loops/Mishief Stroll.ogg"
+  ]
+}
