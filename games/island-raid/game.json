@@ -1,0 +1,18 @@
+{
+  "title": "Island Raid",
+  "description": "A pocket-sized arcade shooter over pixel islands. Your guns fire on their own at planes in the air; drop bombs on the crosshair to knock out guns and tanks on the ground. Grab power-ups, dodge the bullets and bring down the big bombers.",
+  "thumbnail": "2D assets/Pixel Shmup/Sample.png",
+  "assets": [
+    "2D assets/Pixel Shmup/Tilemap/{tiles_packed,ships_packed}.png",
+    "2D assets/Tiny Ski/Tilemap/tilemap_packed.png",
+    "Audio/Retro Sounds 1/Audio/{laser1,laser2,pickup1,pickup2,radar1}.ogg",
+    "Audio/Retro Sounds 2/Audio/{hit1,hit2,hit3,explosion1,explosion2,explosion3,fall1,fall2,upgrade1,hurt1,hurt2}.ogg",
+    "Audio/Sci-Fi Sounds/Audio/{lowFrequency_explosion_000,lowFrequency_explosion_001,explosionCrunch_000,explosionCrunch_001,explosionCrunch_002,forceField_000}.ogg",
+    "Audio/Impact Sounds/Audio/impactSoft_medium_00[1-2].ogg",
+    "Audio/Digital Audio/Audio/laser{5,6}.ogg",
+    "Audio/Interface Sounds/Audio/{click_001,click_002,tick_001,tick_002}.ogg",
+    "Audio/Music Jingles/Audio (Retro)/jingles-retro_0{1,4}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{go,game_over,new_highscore,power_up,war_look_out,war_target_destroyed}.ogg",
+    "Audio/Music Loops/Loops/Mission Plausible.ogg"
+  ]
+}

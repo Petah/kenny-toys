@@ -68,7 +68,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Pirate Pack | **Cannon Duel**: aim cannonballs across the sea at an enemy ship. |
 | | Pixel Line Platformer | **Line Runner**: minimalist pixel platformer with outlined art. |
 | | Pixel Platformer (+ Blocks / Farm / Food / Industrial) | **Pixel Hop**: retro platformer with themed worlds per expansion. |
-| | Pixel Shmup | **Mini Shmup**: vertical pixel shooter with enemy waves. |
+| ✅ | Pixel Shmup | **Island Raid**: vertical pixel shooter over islands, guns for planes and bombs for ground targets. |
 | | Pixel Vehicle Pack | **Rush Hour**: top-down pixel traffic dodger. |
 | ✅ | Planets | Used in **Slingshot**: fling a probe round the planets' gravity to dock with a space station. |
 | | Platformer Assets Base | **Classic Platformer**: the original Kenney alien platformer. |
