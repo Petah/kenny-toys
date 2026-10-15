@@ -31,6 +31,8 @@ const SLOW = 2.5;
 const BRAKE = 4;
 /** A push on the poles: a kick of speed, a while skiing faster than the slope alone allows, and a rest. */
 const PUSH_KICK = 35;
+/** Turn rate times speed for the heaviest spray: the skis swinging round as fast as they go, at a good lick. */
+const CARVE_FULL = 6 * 200;
 const PUSH_BOOST = 0.15;
 const PUSH_S = 0.45;
 const PUSH_REST_S = 0.35;
@@ -96,6 +98,10 @@ export class SlopeScene extends Phaser.Scene {
   private lastCarve = 0;
   private sprayAngle = 90;
   private sprayVel = { x: 0, y: 0 };
+  /** How hard the skier is carving, 0 to 1, eased so the spray swells and dies away. */
+  private carveLevel = 0;
+  /** How fast flakes are thrown off the skis, on top of the skier's own speed. */
+  private sprayThrow = 100;
   private pushT = 0;
   private pushRest = 0;
   private deep = false;
@@ -328,13 +334,14 @@ export class SlopeScene extends Phaser.Scene {
     playSfx(this, SFX, 'whoosh', { volume: 0.25, detune: Phaser.Math.Between(-200, 200) });
     // A kick of snow off the back of the skis.
     this.sprayAngle = 270 - Phaser.Math.RadToDeg(this.heading);
+    this.sprayThrow = 70;
     this.spray.emitParticleAt(this.x, this.y - 1, 6);
   }
 
   /** A random flake velocity: the skier's, mostly, plus a throw at the spray angle. */
   private flakeVelocity() {
     const a = Phaser.Math.DegToRad(this.sprayAngle + Phaser.Math.Between(-25, 25));
-    const throwSpeed = Phaser.Math.Between(40, 140);
+    const throwSpeed = this.sprayThrow * Phaser.Math.FloatBetween(0.4, 1);
     const carry = 0.75;
     this.sprayVel.x = Math.sin(this.heading) * this.speed * carry + Math.cos(a) * throwSpeed;
     this.sprayVel.y = Math.cos(this.heading) * this.speed * carry + Math.sin(a) * throwSpeed;
@@ -397,6 +404,7 @@ export class SlopeScene extends Phaser.Scene {
     this.braking = this.tucking = false;
     this.speed = 0;
     this.pushT = this.pushRest = 0;
+    this.carveLevel = 0;
     this.air = undefined;
     this.crashT = this.ghostT = 0;
     this.camX = 0;
@@ -536,27 +544,33 @@ export class SlopeScene extends Phaser.Scene {
    * a fan in front when braking, and a puff of powder now and then in deep snow.
    */
   private throwSnow(turned: number, dt: number, time: number) {
-    const carve = Math.abs(turned) / dt;
     const fast = Math.min(1, this.speed / 250);
+    // How hard the turn is: how quickly the skis swing round, times how fast they're going.
+    const hard = Math.min(1, (Math.abs(turned) / dt) * this.speed / CARVE_FULL);
+    this.carveLevel += (hard - this.carveLevel) * Math.min(1, dt * 12);
     // Flakes a second, the same whatever the frame rate.
     let rate = 0;
     if (this.braking && this.speed > 40) {
       rate = 420 * fast;
+      this.sprayThrow = 60 + 80 * fast;
       this.sprayAngle = 90 - Phaser.Math.RadToDeg(this.heading) + Phaser.Math.Between(-60, 60);
-    } else if (carve > 0.6 && this.speed > 50) {
-      rate = Math.min(900, 170 * carve) * fast;
+    } else if (this.carveLevel > 0.04) {
+      // A gentle turn lets off a wisp; a hard one at speed a thick fan, thrown further.
+      rate = 1700 * this.carveLevel ** 1.4;
+      this.sprayThrow = 25 + 175 * this.carveLevel;
       // Thrown out sideways from the turn: away from the side the skis are turning towards.
       const along = 90 - Phaser.Math.RadToDeg(this.heading);
-      this.sprayAngle = along + Math.sign(turned) * 80;
+      if (turned !== 0) this.sprayAngle = along + Math.sign(turned) * 80;
     } else if (this.deep && this.speed > 40) {
       rate = 70 * fast;
+      this.sprayThrow = 60;
       this.sprayAngle = 270 + Phaser.Math.Between(-50, 50);
     }
     const n = Math.floor(rate * dt + Math.random());
     if (n > 0) this.spray.emitParticleAt(this.x - Math.sin(this.heading) * 3, this.y - 1, n);
-    if (rate > 120 && time - this.lastCarve > 220) {
+    if (rate > 80 && time - this.lastCarve > 220) {
       this.lastCarve = time;
-      playSfx(this, SFX, 'carve', { volume: Math.min(0.55, this.speed / 450) });
+      playSfx(this, SFX, 'carve', { volume: Math.min(0.6, 0.1 + (this.braking ? fast : this.carveLevel) * 0.5) });
     }
   }
 
