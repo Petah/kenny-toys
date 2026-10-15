@@ -44,13 +44,12 @@ export function preloadAssets(scene: Phaser.Scene) {
 export const T = {
   skier: { green: [70, 71], blue: [82, 83] },
   yeti: { run: [78, 79], roar: 80 },
-  snow: 0,
   tracks: 58,
   ramp: 36,
   flagRed: 20,
   flagBlue: 21,
   banner: [22, 23],
-  lift: { top: 42, pole: 54, base: 66, cable: 46, chairHanger: 44, chair: 57, gondola: [55, 56, 67, 68] },
+  lift: { top: 42, pole: 54, base: 66, cable: 46, shadow: 53, chairHanger: 44, chair: 57, gondola: [55, 56, 67, 68] },
 } as const;
 
 /** The font tiles: digits and a colon, a blob, then A to Z and some symbols, twelve to a row from tile 84. */

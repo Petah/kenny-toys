@@ -2,7 +2,7 @@ import * as Phaser from 'phaser';
 import { playSfx } from '@shared/phaser';
 import { load, submitHighScore } from '@shared/storage';
 import { PIXEL_FONT, RAMP, SFX, SKI, T, TILE, createFont, createRamp, preloadAssets, type Voice } from './assets';
-import { CHUNK, KINDS, makeChunk, touches, type ChunkData, type Gate, type Thing } from './world';
+import { CHUNK, KINDS, difficulty, makeChunk, onPiste, touches, type ChunkData, type Gate, type Thing } from './world';
 
 type State = 'title' | 'playing' | 'caught' | 'over';
 
@@ -17,10 +17,11 @@ const TURN_RATE = 6;
 const TURN_EASE = 14;
 /** How much more the pointer's sideways offset counts than its distance down the screen. */
 const POINTER_SWING = 1.6;
-/** Top speed pointing straight downhill, in pixels a second. It grows the further down you get. */
-const TOP_SPEED = 230;
-const TOP_SPEED_GROWTH = 0.07;
-const TOP_SPEED_MAX = 380;
+/** Top speed pointing straight downhill, in pixels a second, from the top to the hardest part. */
+const TOP_SPEED = 200;
+const TOP_SPEED_MAX = 370;
+/** Deep snow off the piste holds you back to this share of it. */
+const DEEP_SNOW = 0.65;
 /** Across the slope you keep this share of it, so traversing round trees doesn't stall you. */
 const TRAVERSE_SPEED = 0.5;
 const TUCK = 1.15;
@@ -34,15 +35,18 @@ const GHOST_S = 0.8;
 /** Skier's hit box: half its width and its height above the feet. */
 const SKIER_HW = 3;
 const SKIER_H = 3;
-const GATE_STYLE = 10;
+const GATE_STYLE = 5;
 const MAX_CHAIN = 5;
 const JUMP_STYLE = 15;
 const MILESTONE_M = 250;
-/** Where the yeti turns up, how fast he starts and how fast he gets. */
-const YETI_AT_M = 450;
-const YETI_SPEED = 180;
-const YETI_ACCEL = 2.2;
-const YETI_MAX = 340;
+/**
+ * Where the yeti turns up. His speed is a share of the skier's top speed there: slower than a clean
+ * run at first, so only crashes let him close in, then creeping up until he's faster than anyone.
+ */
+const YETI_AT_M = 600;
+const YETI_SPEED = 0.7;
+const YETI_ACCEL = 0.004;
+const YETI_MAX = 1.05;
 /** He's never more than this many screens behind. */
 const YETI_LEASH = 1.6;
 const OVERHEAD = 1e7;
@@ -55,6 +59,7 @@ interface Chunk {
   parts: Phaser.GameObjects.GameObject[];
   sprites: Map<Thing, Phaser.GameObjects.Image>;
   chairs: Phaser.GameObjects.Container[];
+  map: Phaser.Tilemaps.Tilemap;
 }
 
 export class SlopeScene extends Phaser.Scene {
@@ -66,7 +71,6 @@ export class SlopeScene extends Phaser.Scene {
   private seed = 1;
   private chunks = new Map<string, Chunk>();
 
-  private snow!: Phaser.GameObjects.TileSprite;
   private tracks!: Phaser.GameObjects.Graphics;
   private trackPts: ({ x: number; y: number; h: number } | null)[] = [];
   private spray!: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -85,6 +89,8 @@ export class SlopeScene extends Phaser.Scene {
   private ghostT = 0;
   private camX = 0;
   private lastCarve = 0;
+  private sprayAngle = 90;
+  private deep = false;
   private steerByPointer = false;
   private keys?: Record<'left' | 'right' | 'up' | 'down' | 'a' | 'd' | 'w' | 's', Phaser.Input.Keyboard.Key>;
 
@@ -124,22 +130,25 @@ export class SlopeScene extends Phaser.Scene {
     this.uiCam = this.cameras.add(0, 0, this.scale.width, this.scale.height);
     this.cameras.main.ignore(this.ui);
     this.uiCam.ignore(this.world);
-    this.cameras.main.setBackgroundColor(0xf2f7fd);
+    this.cameras.main.setBackgroundColor(0xcfe7f7);
 
-    this.snow = this.add.tileSprite(0, 0, 64, 64, 'snow').setOrigin(0).setDepth(-2);
     this.tracks = this.add.graphics().setDepth(-1);
+    // Snow thrown off the skis, mostly to the outside of a turn.
     this.spray = this.add.particles(0, 0, 'flake', {
-      lifespan: { min: 250, max: 450 },
-      speed: { min: 20, max: 60 },
-      gravityY: 60,
-      alpha: { start: 1, end: 0 },
-      tint: [0xffffff, 0xdbe8f7, 0xc9dcf2],
+      frame: ['fleck', 'fleck', 'clump'],
+      lifespan: { min: 350, max: 800 },
+      speed: { min: 40, max: 170 },
+      angle: { onEmit: () => this.sprayAngle + Phaser.Math.Between(-28, 28) },
+      gravityY: 160,
+      alpha: { start: 1, end: 0, ease: 'Quad.easeIn' },
+      // White to show on the deep snow, blue-grey to show on the piste.
+      tint: [0xffffff, 0xffffff, 0xdbe7f5, 0xb4cbe6, 0x9db6d8],
       emitting: false,
     });
     this.spray.setDepth(OVERHEAD - 10);
     this.shadow = this.add.image(0, 0, 'shadow').setOrigin(0.5, 1).setVisible(false);
     this.skier = this.add.image(0, 0, SKI, this.frames[0]).setOrigin(0.5, 1);
-    this.world.add([this.snow, this.tracks, this.spray, this.shadow, this.skier]);
+    this.world.add([this.tracks, this.spray, this.shadow, this.skier]);
 
     // An arrow at the top of the screen while the yeti's chasing from off it.
     const head = this.add.image(0, 0, SKI, T.yeti.roar).setScale(2);
@@ -168,22 +177,18 @@ export class SlopeScene extends Phaser.Scene {
     this.showTitle();
   }
 
-  /** The snow: the pack's plain snow tile with a light scatter of specks, and a flake for spray. */
+  /** Snow flakes for the spray, and a shadow for jumps. */
   private makeTextures() {
-    if (this.textures.exists('snow')) return;
-    const size = TILE * 8;
-    const tex = this.textures.createCanvas('snow', size, size)!;
-    const f = this.textures.getFrame(SKI, T.snow);
-    for (let ty = 0; ty < 8; ty++) {
-      for (let tx = 0; tx < 8; tx++) tex.context.drawImage(f.source.image as CanvasImageSource, f.cutX, f.cutY, TILE, TILE, tx * TILE, ty * TILE, TILE, TILE);
-    }
-    const rnd = new Phaser.Math.RandomDataGenerator(['snow']);
-    for (let i = 0; i < 70; i++) {
-      tex.context.fillStyle = rnd.pick(['#dce8f6', '#cfdff2', '#ffffff']);
-      tex.context.fillRect(rnd.between(0, size - 1), rnd.between(0, size - 1), 1, 1);
-    }
-    tex.refresh();
-    this.make.graphics({}, false).fillStyle(0xffffff).fillRect(0, 0, 2, 2).generateTexture('flake', 2, 2).destroy();
+    if (this.textures.exists('flake')) return;
+    // Two sizes of flake: a fleck and a three-pixel clump.
+    const flakes = this.textures.createCanvas('flake', 7, 3)!;
+    flakes.context.fillStyle = '#ffffff';
+    flakes.context.fillRect(0, 0, 2, 2);
+    flakes.context.fillRect(4, 1, 3, 1);
+    flakes.context.fillRect(5, 0, 1, 3);
+    flakes.refresh();
+    flakes.add('fleck', 0, 0, 0, 2, 2);
+    flakes.add('clump', 0, 4, 0, 3, 3);
     // A pixel oval under the skier in the air.
     this.make.graphics({}, false).fillStyle(0xb7cbe4).fillRect(2, 0, 8, 3).fillRect(0, 1, 12, 1).generateTexture('shadow', 12, 3).destroy();
   }
@@ -228,14 +233,18 @@ export class SlopeScene extends Phaser.Scene {
     for (const [key, c] of this.chunks) {
       const { cx, cy } = c.data;
       if (cy < cy0 - 1 || cx < cx0 - 2 || cx > cx1 + 2 || cy > cy1 + 2) {
-        c.parts.forEach((p) => p.destroy());
+        this.dropChunk(c);
         this.chunks.delete(key);
       }
     }
   }
 
   private buildChunk(data: ChunkData): Chunk {
-    const chunk: Chunk = { data, parts: [], sprites: new Map(), chairs: [] };
+    // The terrain, as a little tilemap of the pack's tiles.
+    const map = this.make.tilemap({ data: data.tiles, tileWidth: TILE, tileHeight: TILE });
+    const tileset = map.addTilesetImage(SKI)!;
+    const ground = map.createLayer(0, tileset, data.cx * CHUNK, data.cy * CHUNK)!.setDepth(-2);
+    const chunk: Chunk = { data, parts: [ground], sprites: new Map(), chairs: [], map };
     const add = <O extends Phaser.GameObjects.GameObject>(o: O) => (chunk.parts.push(o), o);
     for (const t of data.things) {
       const img = add((t.kind === 'ramp' ? this.add.image(t.x, t.y, RAMP) : this.add.image(t.x, t.y, SKI, KINDS[t.kind].frame)).setOrigin(0.5, 1).setDepth(t.y));
@@ -249,8 +258,10 @@ export class SlopeScene extends Phaser.Scene {
     }
     if (data.lift !== undefined) {
       const x0 = data.cx * CHUNK;
-      // The cable, with the chairs and the odd gondola hanging from it, passing over everything.
+      // The cable, with the chairs and the odd gondola hanging from it, passing over everything,
+      // and its shadow on the snow below, as in the pack's sample map.
       add(this.add.tileSprite(x0, data.lift, CHUNK, TILE, SKI, T.lift.cable).setOrigin(0, 0.5).setDepth(OVERHEAD));
+      add(this.add.tileSprite(x0, data.lift + 40, CHUNK, TILE, SKI, T.lift.shadow).setOrigin(0, 1).setDepth(-1.5));
       for (let i = 0; i < 4; i++) {
         const gondola = (data.cx + i) % 3 === 0;
         const parts = gondola
@@ -266,6 +277,11 @@ export class SlopeScene extends Phaser.Scene {
     }
     this.world.add(chunk.parts);
     return chunk;
+  }
+
+  private dropChunk(c: Chunk) {
+    c.parts.forEach((p) => p.destroy());
+    c.map.destroy();
   }
 
   /** Chairs creep along the cable; every chunk has the same pattern, so they cross chunk edges smoothly. */
@@ -336,7 +352,7 @@ export class SlopeScene extends Phaser.Scene {
 
   /** A fresh slope and a skier at the top of it. */
   private resetRun() {
-    for (const c of this.chunks.values()) c.parts.forEach((p) => p.destroy());
+    for (const c of this.chunks.values()) this.dropChunk(c);
     this.chunks.clear();
     this.seed = Math.floor(Math.random() * 1e9);
     this.frames = Math.random() < 0.5 ? T.skier.green : T.skier.blue;
@@ -442,7 +458,6 @@ export class SlopeScene extends Phaser.Scene {
     this.moveChairs(time);
     this.drawSkier();
     this.drawTracks();
-    this.placeSnow();
   }
 
   private ski(dt: number, time: number) {
@@ -458,7 +473,8 @@ export class SlopeScene extends Phaser.Scene {
     const turn = Phaser.Math.Clamp((this.target - this.heading) * TURN_EASE * dt, -TURN_RATE * dt, TURN_RATE * dt);
     if (!this.air) this.heading += turn;
     // Speed closes on a target set by where the skis point: fastest straight down, slower across.
-    const top = Math.min(TOP_SPEED_MAX, TOP_SPEED + this.metres * TOP_SPEED_GROWTH);
+    this.deep = !this.air && !onPiste(this.seed, this.x, this.y);
+    const top = this.topSpeed * (this.deep ? DEEP_SNOW : 1);
     const want = this.braking && !this.air ? 0 : top * (TRAVERSE_SPEED + (1 - TRAVERSE_SPEED) * Math.cos(this.heading)) * (this.tucking ? TUCK : 1);
     const rate = this.braking ? BRAKE : this.speed < want ? ACCEL : SLOW;
     this.speed += (want - this.speed) * Math.min(1, rate * dt);
@@ -471,18 +487,42 @@ export class SlopeScene extends Phaser.Scene {
       this.air.t += dt;
       if (this.air.t >= this.air.dur) this.land();
     } else {
-      // Carving hard throws up snow, and makes a crunch now and then.
-      const carve = Math.abs(this.heading - before) / dt;
-      // About 60 or 120 flakes a second, whatever the frame rate.
-      if ((carve > 1.5 || this.braking) && this.speed > 60 && Math.random() < dt * 60) {
-        this.spray.emitParticleAt(this.x - Math.sin(this.heading) * 3, this.y - 1, carve > 3 ? 2 : 1);
-        if (time - this.lastCarve > 260) {
-          this.lastCarve = time;
-          playSfx(this, SFX, 'carve', { volume: Math.min(0.5, this.speed / 500) });
-        }
-      }
+      this.throwSnow(this.heading - before, dt, time);
       this.addTrack();
     }
+  }
+
+  /**
+   * Snow off the skis: a spray to the outside of a turn that grows with how hard and fast you carve,
+   * a fan in front when braking, and a puff of powder now and then in deep snow.
+   */
+  private throwSnow(turned: number, dt: number, time: number) {
+    const carve = Math.abs(turned) / dt;
+    const fast = Math.min(1, this.speed / 250);
+    // Flakes a second, the same whatever the frame rate.
+    let rate = 0;
+    if (this.braking && this.speed > 40) {
+      rate = 420 * fast;
+      this.sprayAngle = 90 - Phaser.Math.RadToDeg(this.heading) + Phaser.Math.Between(-60, 60);
+    } else if (carve > 0.6 && this.speed > 50) {
+      rate = Math.min(900, 170 * carve) * fast;
+      // Thrown outwards from the turn and a little ahead.
+      const along = 90 - Phaser.Math.RadToDeg(this.heading);
+      this.sprayAngle = along - Math.sign(turned) * 75;
+    } else if (this.deep && this.speed > 40) {
+      rate = 70 * fast;
+      this.sprayAngle = 270 + Phaser.Math.Between(-50, 50);
+    }
+    const n = Math.floor(rate * dt + Math.random());
+    if (n > 0) this.spray.emitParticleAt(this.x - Math.sin(this.heading) * 3, this.y - 1, n);
+    if (rate > 120 && time - this.lastCarve > 220) {
+      this.lastCarve = time;
+      playSfx(this, SFX, 'carve', { volume: Math.min(0.55, this.speed / 450) });
+    }
+  }
+
+  private get topSpeed() {
+    return Phaser.Math.Linear(TOP_SPEED, TOP_SPEED_MAX, difficulty(this.metres));
   }
 
   private addTrack() {
@@ -495,7 +535,7 @@ export class SlopeScene extends Phaser.Scene {
   /** Two thin lines behind the skis, broken where the skier was in the air. */
   private drawTracks() {
     const g = this.tracks.clear();
-    g.lineStyle(1, 0xc3d4ea, 1);
+    g.lineStyle(1, 0xb3cbe6, 1);
     for (const side of [-2, 2]) {
       g.beginPath();
       let pen = false;
@@ -636,15 +676,6 @@ export class SlopeScene extends Phaser.Scene {
     cam.setScroll(snapped(this.camX - cam.width / 2, cam.width), snapped(this.y + viewH * (0.5 - SKIER_AT) - cam.height / 2, cam.height));
   }
 
-  /** The snow sits under the view, lined up with the tiles so it never seems to slide. */
-  private placeSnow() {
-    const view = this.cameras.main.worldView;
-    const step = TILE * 8;
-    const x = Math.floor(view.x / step) * step;
-    const y = Math.floor(view.y / step) * step;
-    this.snow.setPosition(x, y).setSize(view.width + step * 2, view.height + step * 2);
-  }
-
   // ---- Yeti --------------------------------------------------------------------------------
 
   private updateYeti(dt: number, time: number) {
@@ -661,7 +692,7 @@ export class SlopeScene extends Phaser.Scene {
     const yeti = this.yeti;
     yeti.t += dt;
     const viewH = this.cameras.main.height / this.cameras.main.zoom;
-    const speed = Math.min(YETI_MAX, YETI_SPEED + yeti.t * YETI_ACCEL);
+    const speed = this.topSpeed * Math.min(YETI_MAX, YETI_SPEED + yeti.t * YETI_ACCEL);
     const dx = this.x - yeti.x;
     const dy = this.y - yeti.y;
     const d = Math.hypot(dx, dy);
