@@ -23,7 +23,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Crosshair Pack | **Aim Trainer**: targets pop up and you click them fast, tracking reaction-time stats. |
 | | Desert Shooter Pack | *(sounds only)*: shot, coin and explosion SFX used across shooters. |
 | | Development Essentials | *(utility)*: checkerboards, noise and UV textures for prototyping. |
-| 🎯 | Domino Pack | **Domino Chain**: place dominoes, tip the first, watch the chain reaction. |
+| ✅ | Domino Pack (+ Boardgame Pack) | **Domino Chain**: draw lines of dominoes through the pawns on a card table, tip the first, watch the chain reaction. |
 | ✅ | Donuts (+ Splat Pack) | **Donut Splat**: Fruit Ninja with donuts; slices paint glaze splats. |
 | | Emote Pack | **Emote Match**: match-3 with speech-bubble emotes. |
 | | Explosion Pack | *(effects)*: explosion flipbooks for any game; toy idea: **Boom Box** click-to-detonate. |

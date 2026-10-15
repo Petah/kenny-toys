@@ -1,0 +1,14 @@
+{
+  "title": "Domino Chain",
+  "description": "Draw lines of dominoes across the table, through every pawn, then tip the first one and watch the chain go. Branch, cross and curve your lines, but bend too tight and the chain breaks.",
+  "thumbnail": "2D assets/Domino Pack/Preview.png",
+  "assets": [
+    "2D assets/Domino Pack/Tilesheets/{light,dark,gingerbread,hearts,stars}.png",
+    "2D assets/Boardgame Pack/PNG/Pieces (*)/piece*_border{00,01,18}.png",
+    "2D assets/Boardgame Pack/Spritesheets/{diceWhite_border,chips}.{png,xml}",
+    "Audio/Casino Audio/Audio/{chip-lay-[1-3],chips-collide-[1-4],die-throw-[1-4],chips-stack-[1-3],card-shuffle,card-slide-[1-2]}.ogg",
+    "Audio/Interface Sounds/Audio/{click_001,click_002,tick_001,tick_002,error_004}.ogg",
+    "Audio/Music Jingles/Audio (Steeldrum)/jingles-steel_{00,05,09}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{round,go,game_over,new_highscore,[1-9],10}.ogg"
+  ]
+}
