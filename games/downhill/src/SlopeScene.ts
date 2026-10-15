@@ -57,6 +57,9 @@ const YETI_MAX = 1.2;
 /** He's never more than this many screens behind. */
 const YETI_LEASH = 1.6;
 const OVERHEAD = 1e7;
+/** Cars on a chairlift: this many to a chunk, evenly spaced. */
+const CHAIRS_PER_CHUNK = 4;
+const CHAIR_SPACING = CHUNK / CHAIRS_PER_CHUNK;
 const INK = 0x3a2836;
 const PALE = 0xa8c4e6;
 const GOLD = 0xffd23f;
@@ -65,7 +68,7 @@ interface Chunk {
   data: ChunkData;
   parts: Phaser.GameObjects.GameObject[];
   sprites: Map<Thing, Phaser.GameObjects.Image>;
-  chairs: Phaser.GameObjects.Container[];
+  chairs: { offset: number; chair: Phaser.GameObjects.Container; gondola: Phaser.GameObjects.Container }[];
   map: Phaser.Tilemaps.Tilemap;
 }
 
@@ -281,17 +284,21 @@ export class SlopeScene extends Phaser.Scene {
       // and its shadow on the snow below, as in the pack's sample map.
       add(this.add.tileSprite(x0, data.lift, CHUNK, TILE, SKI, T.lift.cable).setOrigin(0, 0.5).setDepth(OVERHEAD));
       add(this.add.tileSprite(x0, data.lift + 40, CHUNK, TILE, SKI, T.lift.shadow).setOrigin(0, 1).setDepth(-1.5));
-      for (let i = 0; i < 4; i++) {
-        const gondola = (data.cx + i) % 3 === 0;
-        const parts = gondola
-          ? [
+      // Each slot has a chair and a gondola, and shows whichever is passing through it: a car
+      // keeps its kind all along the cable, rather than changing as it crosses into the next chunk.
+      for (let i = 0; i < CHAIRS_PER_CHUNK; i++) {
+        const gondola = add(
+          this.add
+            .container(0, data.lift, [
               this.add.image(0, 0, SKI, 45),
-              ...T.lift.gondola.map((f, j) => this.add.image((j % 2 ? 8 : -8), TILE + Math.floor(j / 2) * TILE, SKI, f)),
-            ]
-          : [this.add.image(0, 0, SKI, T.lift.chairHanger), this.add.image(0, TILE, SKI, T.lift.chair)];
-        const chair = add(this.add.container(0, data.lift, parts).setDepth(OVERHEAD + 2));
-        chair.setData('offset', i * (CHUNK / 4));
-        chunk.chairs.push(chair);
+              ...T.lift.gondola.map((f, j) => this.add.image(j % 2 ? 8 : -8, TILE + Math.floor(j / 2) * TILE, SKI, f)),
+            ])
+            .setDepth(OVERHEAD + 2),
+        );
+        const chair = add(
+          this.add.container(0, data.lift, [this.add.image(0, 0, SKI, T.lift.chairHanger), this.add.image(0, TILE, SKI, T.lift.chair)]).setDepth(OVERHEAD + 2),
+        );
+        chunk.chairs.push({ offset: i * CHAIR_SPACING, chair, gondola });
       }
     }
     this.world.add(chunk.parts);
@@ -303,11 +310,20 @@ export class SlopeScene extends Phaser.Scene {
     c.map.destroy();
   }
 
-  /** Chairs creep along the cable; every chunk has the same pattern, so they cross chunk edges smoothly. */
+  /**
+   * Cars creep along the cable. Each chunk's slots wrap round within it, so a car leaving one chunk
+   * carries on in the next; which car it is, and so whether it's a chair or a gondola, comes from
+   * where it is on the whole cable.
+   */
   private moveChairs(time: number) {
+    const shift = time * 0.018;
     for (const c of this.chunks.values()) {
-      for (const chair of c.chairs) {
-        chair.x = c.data.cx * CHUNK + Math.floor((chair.getData('offset') + time * 0.018) % CHUNK);
+      for (const slot of c.chairs) {
+        const x = c.data.cx * CHUNK + ((slot.offset + shift) % CHUNK);
+        const car = Math.round((x - shift) / CHAIR_SPACING);
+        const gondola = ((car % 3) + 3) % 3 === 0;
+        slot.chair.setVisible(!gondola).setX(Math.floor(x));
+        slot.gondola.setVisible(gondola).setX(Math.floor(x));
       }
     }
   }
