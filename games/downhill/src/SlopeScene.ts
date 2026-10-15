@@ -620,7 +620,14 @@ export class SlopeScene extends Phaser.Scene {
     const lead = Math.sin(this.heading) * Math.min(1, this.speed / 200) * viewW * 0.12;
     const want = this.x + lead;
     this.camX = snap ? want : this.camX + (want - this.camX) * Math.min(1, dt * 3);
-    cam.centerOn(Math.round(this.camX), Math.round(this.y + viewH * (0.5 - SKIER_AT)));
+    // Phaser zooms round the middle of the screen, which falls on a half pixel when the window is an
+    // odd size. Nudging the scroll by a fraction keeps every texel on whole screen pixels; otherwise
+    // sprites lose an edge row or pick up a line from their neighbour in the sheet.
+    const snapped = (want: number, size: number) => {
+      const frac = ((((size / 2) * (1 - cam.zoom)) % 1) + 1) % 1;
+      return Math.round(want) + frac / cam.zoom;
+    };
+    cam.setScroll(snapped(this.camX - cam.width / 2, cam.width), snapped(this.y + viewH * (0.5 - SKIER_AT) - cam.height / 2, cam.height));
   }
 
   /** The snow sits under the view, lined up with the tiles so it never seems to slide. */
