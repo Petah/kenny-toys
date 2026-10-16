@@ -1,0 +1,18 @@
+{
+  "title": "Pirate Cove",
+  "description": "Two and a half minutes of plunder: sail your pirate ship round the islands, bring your broadsides to bear on the navy, dodge the forts' cannon and scoop up the gold they leave behind.",
+  "thumbnail": "3D assets/Pirate Kit/Sample.png",
+  "assets": [
+    "3D assets/Pirate Kit/Models/GLB format/{ship-pirate-small,ship-small,ship-medium,ship-large,cannon-ball,barrel,crate,chest,patch-sand,patch-sand-foliage,patch-grass-foliage,palm-straight,palm-bend,palm-detailed-straight,rocks-a,rocks-b,rocks-c,rocks-sand-a,rocks-sand-b,tower-complete-small,flag-pirate,ship-wreck}.glb",
+    "3D assets/Pirate Kit/Models/GLB format/Textures/colormap.png",
+    "Audio/Sci-Fi Sounds/Audio/{lowFrequency_explosion_000,lowFrequency_explosion_001,explosionCrunch_000,explosionCrunch_002}.ogg",
+    "Audio/Impact Sounds/Audio/impactWood_heavy_00[0-2].ogg",
+    "Audio/Foley Sounds/Audio/Water/sinkWater[1-2].ogg",
+    "Audio/RPG Audio/Audio/{handleCoins,handleCoins2,creak1,creak2}.ogg",
+    "Audio/Foley Sounds/Audio/Rocks/stoneDragHit1.ogg",
+    "Audio/Interface Sounds/Audio/{click_001,click_002,tick_002}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{go,time_over,new_highscore,hurry_up,game_over}.ogg",
+    "Audio/Music Jingles/Audio (Steeldrum)/jingles-steel_{06,11}.ogg",
+    "Audio/Music Loops/Loops/Italian Mom.ogg"
+  ]
+}

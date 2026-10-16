@@ -158,7 +158,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Modular Buildings | **Street Builder**: assemble building façades along a street. |
 | | Modular Cave / Dungeon / Space Kit | **Maze Explorer**: first-person procedural maze from modular rooms. |
 | | Nature Kit (+ Classic) | **Island Walk**: wander a procedurally placed nature island. |
-| | Pirate Kit | **Pirate Cove**: sail a ship between islands collecting treasure. |
+| ✅ | Pirate Kit | **Pirate Cove**: sail a ship between islands collecting treasure. |
 | | Platformer Kit | **3D Hop**: Mario 64-style mini platformer course. |
 | | Prototype Kit | **Obstacle Course**: physics obstacle course built from blockout pieces. |
 | | Racing Kit (+ Early access) | **Kart Track**: low-poly kart time trial. |

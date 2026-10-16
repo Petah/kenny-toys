@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:," />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Pirate Cove</title>
+    <style>
+      html:root { --bg: #9fd8f2; --shade: #3b2414; --gold: #ffd23f; }
+      body { overflow: hidden; user-select: none; -webkit-user-select: none; }
+      #stage { position: fixed; inset: 0; touch-action: none; }
+      .hud { position: fixed; z-index: 4; pointer-events: none; color: #fff; font-family: 'Kenney Bold', sans-serif;
+        text-shadow: 0 3px 0 var(--shade), 0 -2px 0 var(--shade), 2px 0 0 var(--shade), -2px 0 0 var(--shade); }
+      #gold-box { top: 12px; left: 160px; font-size: clamp(30px, 6vw, 44px); color: var(--gold); display: flex; align-items: center; gap: 8px; }
+      #gold-box i { width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff3a0, #ffc21a 55%, #c98a00); box-shadow: 0 3px 0 var(--shade); }
+      #clock { top: 12px; left: 50%; transform: translateX(-50%); font-size: clamp(30px, 6vw, 44px); }
+      #clock.hurry { color: #ffb0a0; }
+      #hull { top: 16px; right: 16px; width: min(34vw, 220px); height: 22px; border-radius: 11px; background: rgba(59,36,20,0.6); border: 3px solid #fff; overflow: hidden; }
+      #hull-fill { height: 100%; width: 100%; background: #7ee05a; transition: width 0.25s; }
+      #hull.hurt { animation: hurt 0.4s; }
+      @keyframes hurt { 30% { transform: translateX(-6px); border-color: #ff5a4e; } 60% { transform: translateX(6px); } }
+      #hull-label { top: 44px; right: 18px; font-size: 13px; color: var(--gold); }
+      #radar { position: fixed; z-index: 4; left: 14px; bottom: 14px; width: 130px; height: 130px; pointer-events: none; }
+      #controls { position: fixed; z-index: 5; right: 14px; bottom: 14px; display: flex; gap: 10px; align-items: flex-end; }
+      .fire { --reload: 0%; position: relative; width: 84px; height: 84px; border-radius: 50%; font: 15px 'Kenney Bold', sans-serif; color: #fff; padding: 0;
+        background: linear-gradient(to top, #c4532f calc(100% - var(--reload)), #6a4a3a calc(100% - var(--reload))); border: 4px solid rgba(255,255,255,0.8); line-height: 1.1; }
+      .fire.ready { box-shadow: 0 0 0 4px rgba(255, 210, 63, 0.6); }
+      #sail { font-size: 14px; padding: 10px 12px; }
+      #keys { bottom: 160px; left: 16px; font: 12px 'Kenney Future', sans-serif; text-shadow: 0 2px 0 var(--shade); opacity: 0.85; line-height: 1.5; }
+      @media (pointer: coarse) { #keys { display: none; } }
+      @media (pointer: fine) { #controls .fire { width: 70px; height: 70px; font-size: 13px; } }
+      .pop { position: fixed; z-index: 5; pointer-events: none; font: 26px 'Kenney Bold', sans-serif; color: #fff; transform: translate(-50%, -50%); white-space: nowrap;
+        text-shadow: 0 3px 0 var(--shade), 0 -2px 0 var(--shade), 2px 0 0 var(--shade), -2px 0 0 var(--shade); animation: pop 1.1s ease-out forwards; }
+      .pop.gold { color: var(--gold); }
+      .pop.fix { color: #9ff09a; }
+      @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; } 15% { transform: translate(-50%, -60%) scale(1.1); opacity: 1; }
+        70% { opacity: 1; } 100% { transform: translate(-50%, -190%) scale(1); opacity: 0; } }
+      .card { position: fixed; z-index: 7; inset: 0; display: none; place-items: center; background: rgba(30, 20, 10, 0.35); }
+      .card.show { display: grid; }
+      .card > div { background: #8a5a3c; border: 4px solid rgba(255,255,255,0.45); border-radius: 22px; padding: 22px 26px 18px; color: #fff;
+        font-family: 'Kenney Bold', sans-serif; text-align: center; max-width: 94vw; box-shadow: 0 10px 0 rgba(0,0,0,0.25); }
+      .card h1 { margin: 0 0 6px; font-size: clamp(46px, 11vw, 84px); font-weight: normal; line-height: 1;
+        text-shadow: 0 5px 0 var(--shade), 0 -3px 0 var(--shade), 3px 0 0 var(--shade), -3px 0 0 var(--shade); }
+      .card h2 { margin: 0 0 10px; font-size: clamp(30px, 7vw, 46px); font-weight: normal; }
+      .card p { margin: 8px auto 14px; color: var(--gold); max-width: 440px; }
+      .card .stats { display: flex; gap: 26px; justify-content: center; margin: 0 0 12px; }
+      .card .stats div { font-size: clamp(28px, 7vw, 40px); }
+      .card .stats small { display: block; font-size: 13px; color: var(--gold); }
+      .card .btn { font-size: 22px; padding: 12px 34px; }
+      #title { background: none; place-items: end center; padding-bottom: 8vh; }
+      #title > div { background: rgba(138, 90, 60, 0.85); }
+      @media (max-width: 600px) {
+        #gold-box { top: 56px; left: 14px; font-size: 28px; }
+        #clock { top: 56px; left: auto; right: 16px; transform: none; font-size: 28px; }
+        #hull { top: 98px; right: 16px; width: 44vw; }
+        #hull-label { top: 126px; }
+        #radar { width: 96px; height: 96px; top: 100px; bottom: auto; }
+      }
+      body.on-title .hud, body.on-title #controls, body.on-title #radar { display: none !important; }
+    </style>
+  </head>
+  <body class="on-title">
+    <div id="stage"></div>
+    <div id="gold-box" class="hud"><i></i><span id="gold">0</span></div>
+    <div id="clock" class="hud">2:30</div>
+    <div id="hull" class="hud"><div id="hull-fill"></div></div>
+    <div id="hull-label" class="hud">HULL</div>
+    <canvas id="radar" width="200" height="200"></canvas>
+    <div id="keys" class="hud">A D or arrows: steer<br />W S: sails<br />Q E: fire left or right<br />or click the water to fire that way</div>
+    <div id="controls">
+      <button id="sail" class="btn">Half sail</button>
+      <button id="fire-left" class="fire">FIRE<br />LEFT</button>
+      <button id="fire-right" class="fire">FIRE<br />RIGHT</button>
+    </div>
+    <div id="over" class="card"><div>
+      <h2 id="over-title">Time to sail home</h2>
+      <div class="stats"><div><span id="over-gold">0</span><small>GOLD</small></div><div><span id="over-sunk">0</span><small>SHIPS SUNK</small></div></div>
+      <p id="over-note"></p>
+      <button id="over-go" class="btn">Set sail again</button>
+    </div></div>
+    <div id="title" class="card show"><div>
+      <h1>PIRATE COVE</h1>
+      <p>Two and a half minutes to plunder the navy. Bring your broadsides to bear, keep clear of the forts, and scoop up the gold.</p>
+      <button id="title-play" class="btn">Set sail!</button>
+      <p id="title-best"></p>
+    </div></div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
