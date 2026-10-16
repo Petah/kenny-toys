@@ -352,8 +352,9 @@ export class StackGame {
     $<HTMLImageElement>('next-icon').src = this.icons[this.nextKind];
     this.held = this.makeView(kind);
     this.play(this.held, 'walk');
-    this.angle = 0;
-    this.shownAngle = 0;
+    // After the first few, pets come any way up, so each one wants turning to sit right.
+    this.angle = this.turn < 3 ? 0 : (Math.floor(Math.random() * 4) * Math.PI) / 2;
+    this.shownAngle = this.angle;
     this.holdY = this.wantedHoldY();
     this.aimLeft = aimTime(this.placed);
     this.lastTick = Math.ceil(this.aimLeft);

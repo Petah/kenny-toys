@@ -9,10 +9,15 @@ import { readFileSync } from 'node:fs';
 import RAPIER from '@dimforge/rapier3d-compat';
 import { readGlbParts } from '../../../shared/glb.ts';
 import { PETS } from '../src/pets.ts';
-import { DROP_GAP, STEP, Stack, extent, shapeOf, type PetShape } from '../src/stack.ts';
+import { DROP_GAP, FEEL, STEP, Stack, extent, shapeOf, type PetShape } from '../src/stack.ts';
 
 const TOWERS = Number(process.argv[2] ?? 20);
 const NOISE = Number(process.env.NOISE ?? 0.2);
+// FEEL=angularDamping=2,friction=0.8 tries other physics.
+for (const kv of (process.env.FEEL ?? '').split(',').filter(Boolean)) {
+  const [k, v] = kv.split('=');
+  (FEEL as Record<string, number>)[k] = Number(v);
+}
 const DIR = new URL('../../../../Kenney Game Assets All-in-1 3.7.0/3D assets/Cube Pets/Models/GLB format/', import.meta.url);
 const shapes: Record<string, PetShape> = {};
 for (const pet of PETS) {
@@ -75,7 +80,7 @@ function choose(stack: Stack, pet: string) {
 
 const counts: number[] = [];
 const heights: number[] = [];
-for (let n = 0; n < TOWERS; n++) {
+for (let n = 0; n < (process.env.LAZY_ONLY ? 0 : TOWERS); n++) {
   const stack = new Stack(shapes);
   let placed = 0;
   let best = 0;
@@ -93,10 +98,27 @@ for (let n = 0; n < TOWERS; n++) {
   heights.push(best * 10);
   process.stdout.write(`${placed} `);
 }
+// The lazy bot drops every pet in the middle the way up it comes (as in the game, any way up).
+const lazy: number[] = [];
+for (let n = 0; n < TOWERS; n++) {
+  const stack = new Stack(shapes);
+  let placed = 0;
+  for (let i = 0; i < 40; i++) {
+    const pet = PETS[Math.floor(rand() * PETS.length)];
+    const angle = (Math.floor(rand() * 4) * Math.PI) / 2;
+    stack.drop(pet, 0, stack.height() + DROP_GAP - extent(shapes[pet], angle).minY, angle);
+    settle(stack);
+    if (stack.pets.some((p) => p.state === 'fallen')) break;
+    placed++;
+  }
+  lazy.push(placed);
+}
+lazy.sort((a, b) => a - b);
 counts.sort((a, b) => a - b);
 heights.sort((a, b) => a - b);
 const median = (a: number[]) => a[Math.floor(a.length / 2)];
-console.log(`\nBot towers (${TOWERS}): pets before the first fall: median ${median(counts)}, range ${counts[0]}–${counts.at(-1)}; height median ${median(heights).toFixed(0)}cm, best ${heights.at(-1)!.toFixed(0)}cm`);
+if (counts.length) console.log(`\nBot towers (${TOWERS}): pets before the first fall: median ${median(counts)}, range ${counts[0]}–${counts.at(-1)}; height median ${median(heights).toFixed(0)}cm, best ${heights.at(-1)!.toFixed(0)}cm`);
+console.log(`Lazy towers (${TOWERS}, every pet dropped in the middle as it comes): median ${median(lazy)}, range ${lazy[0]}–${lazy.at(-1)}`);
 if (failed) {
   console.log('Some pet would not sit still upright on its own.');
   process.exit(1);
