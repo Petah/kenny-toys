@@ -49,7 +49,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Isometric Tower Defense | **Iso TD**: classic tower defense on an iso map. |
 | | Isometric Vector Buildings / Roads | **Road Connector**: rotate road tiles to link every house to the road. |
 | | Isometric Watercraft | **Harbour Master**: dock incoming boats at the right piers. |
-| 🎯 | Jumper Pack | **Sky Jumper**: Doodle Jump-style endless upward bouncer. |
+| ✅ | Jumper Pack | **Sky Jumper**: Doodle Jump-style endless upward bouncer. |
 | ✅ | Letter Tiles / Redux | **Word Drop**: letter tiles drop into a well; swipe or type words through touching tiles to clear them before a column overflows. |
 | | Light Masks | **Flashlight Hunt**: dark room lit only by your torch; find the hidden things. |
 | | Map Pack | **Map Maker**: paint a fantasy world map from terrain tiles. |
