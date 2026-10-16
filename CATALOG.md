@@ -130,7 +130,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Kit | Game |
 |---|---|---|
 | | Animated Characters (Bundle / Protagonists / Retro / Survivors) | **Run Cycle**: third-person character controller playground. |
-| | Blaster Kit | **Blaster Range**: first-person toy blaster gallery. |
+| ✅ | Blaster Kit | **Blaster Range**: first-person toy blaster gallery. |
 | | Blocky Characters | **Blocky Party**: crowd of blocky characters dancing to music. |
 | | Brick Kit | **Brick Builder**: snap LEGO-style bricks into a model. |
 | | Building Kit | **House Builder**: place walls, doors and roofs into a house. |

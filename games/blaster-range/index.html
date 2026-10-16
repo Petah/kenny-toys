@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:," />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Blaster Range</title>
+    <style>
+      html:root { --bg: #2a2f45; --shade: #1d2140; --gold: #ffd23f; }
+      body { overflow: hidden; user-select: none; -webkit-user-select: none; }
+      #stage { position: fixed; inset: 0; touch-action: none; cursor: none; }
+      body.on-title #stage, body:has(#over.show) #stage { cursor: auto; }
+      .hud { position: fixed; z-index: 4; pointer-events: none; color: #fff; font-family: 'Kenney Bold', sans-serif;
+        text-shadow: 0 3px 0 var(--shade), 0 -2px 0 var(--shade), 2px 0 0 var(--shade), -2px 0 0 var(--shade); }
+      #score { top: 56px; left: 16px; font-size: clamp(34px, 7vw, 52px); }
+      #combo { top: calc(62px + clamp(34px, 7vw, 52px)); left: 18px; font-size: 18px; color: var(--gold); }
+      #clock { top: 10px; left: 50%; transform: translateX(-50%); font-size: clamp(32px, 6vw, 46px); }
+      #clock.hurry { color: #ffb0a0; }
+      #ammo { bottom: 18px; right: 18px; display: flex; gap: 4px; flex-wrap: wrap-reverse; justify-content: flex-end; max-width: 50vw; }
+      #ammo i { width: 10px; height: 30px; border-radius: 5px 5px 2px 2px; background: linear-gradient(#ff8a3c 0 30%, #3f86e0 30%); box-shadow: 0 2px 0 var(--shade); }
+      #ammo i.used { opacity: 0.2; }
+      #reload { bottom: 60px; right: 18px; font-size: 20px; color: var(--gold); opacity: 0; transition: opacity 0.15s; }
+      #reload.show { opacity: 1; animation: blink 0.3s infinite alternate; }
+      @keyframes blink { to { opacity: 0.5; } }
+      #hint { bottom: 18px; left: 18px; font-size: 13px; font-family: 'Kenney Future', sans-serif; opacity: 0.85; }
+      #crosshair { position: fixed; z-index: 5; width: 44px; height: 44px; margin: -22px 0 0 -22px; pointer-events: none; left: 50%; top: 50%; }
+      #crosshair circle, #crosshair line { stroke: #fff; stroke-width: 3; fill: none; filter: drop-shadow(0 0 2px #000); }
+      #crosshair .dot { fill: #ff5a4e; stroke: none; }
+      @media (pointer: coarse) { #crosshair { display: none; } #hint { display: none; } }
+      .pop { position: fixed; z-index: 5; pointer-events: none; font: 24px 'Kenney Bold', sans-serif; color: #fff; transform: translate(-50%, -50%); white-space: nowrap;
+        text-shadow: 0 3px 0 var(--shade), 0 -2px 0 var(--shade), 2px 0 0 var(--shade), -2px 0 0 var(--shade); animation: pop 1s ease-out forwards; }
+      .pop.bull { color: var(--gold); font-size: 30px; }
+      .pop.lost { color: #ffb0a0; font-size: 18px; }
+      @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; } 15% { transform: translate(-50%, -60%) scale(1.15); opacity: 1; }
+        70% { opacity: 1; } 100% { transform: translate(-50%, -190%) scale(1); opacity: 0; } }
+      .card { position: fixed; z-index: 6; inset: 0; display: none; place-items: center; background: rgba(20, 20, 40, 0.45); }
+      .card.show { display: grid; }
+      .card > div { background: #3f4a80; border: 4px solid rgba(255,255,255,0.4); border-radius: 22px; padding: 20px 24px 18px; color: #fff;
+        font-family: 'Kenney Bold', sans-serif; text-align: center; max-width: 94vw; box-shadow: 0 10px 0 rgba(0,0,0,0.3); }
+      .card h1 { margin: 0 0 4px; font-size: clamp(42px, 10vw, 76px); font-weight: normal; line-height: 1;
+        text-shadow: 0 5px 0 var(--shade), 0 -3px 0 var(--shade), 3px 0 0 var(--shade), -3px 0 0 var(--shade); }
+      .card h2 { margin: 0 0 10px; font-size: clamp(30px, 7vw, 46px); font-weight: normal; }
+      .card p { margin: 6px 0 12px; color: var(--gold); }
+      #picker { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 12px 0 6px; }
+      .pick { width: 168px; display: grid; justify-items: center; gap: 2px; padding: 8px 8px 12px; background: #e8473a; }
+      .pick img { width: 120px; height: 120px; }
+      .pick b { font: 22px 'Kenney Bold', sans-serif; font-weight: normal; }
+      .pick small { font: 11px 'Kenney Future', sans-serif; color: #ffe9b0; }
+      .stats { display: flex; gap: 22px; justify-content: center; margin: 0 0 12px; }
+      .stats div { font-size: clamp(28px, 7vw, 40px); }
+      .stats small { display: block; font-size: 13px; color: var(--gold); }
+      .card .btn { font-size: 20px; padding: 10px 26px; margin: 0 4px; }
+      @media (max-width: 560px) {
+        #clock { left: auto; right: 16px; transform: none; }
+        .pick { width: 108px; }
+        .pick img { width: 80px; height: 80px; }
+        .pick b { font-size: 17px; }
+        .pick small { font-size: 9px; }
+      }
+      body.on-title .hud, body.on-title #crosshair { display: none !important; }
+    </style>
+  </head>
+  <body class="on-title">
+    <div id="stage"></div>
+    <div id="score" class="hud">0</div>
+    <div id="combo" class="hud"></div>
+    <div id="clock" class="hud">1:00</div>
+    <div id="ammo" class="hud"></div>
+    <div id="reload" class="hud">RELOADING</div>
+    <div id="hint" class="hud">Click to fire, right-click or R to reload</div>
+    <svg id="crosshair" viewBox="0 0 44 44"><circle cx="22" cy="22" r="12" /><line x1="22" y1="2" x2="22" y2="12" /><line x1="22" y1="32" x2="22" y2="42" /><line x1="2" y1="22" x2="12" y2="22" /><line x1="32" y1="22" x2="42" y2="22" /><circle class="dot" cx="22" cy="22" r="2.5" /></svg>
+    <div id="over" class="card"><div>
+      <h2 id="over-title">Time!</h2>
+      <div class="stats"><div><span id="over-score">0</span><small>SCORE</small></div><div><span id="over-hits">0</span><small>TARGETS</small></div><div><span id="over-acc">0%</span><small>ACCURACY</small></div></div>
+      <p id="over-note"></p>
+      <button id="again" class="btn">Again</button><button id="swap" class="btn">Swap blaster</button>
+    </div></div>
+    <div id="title" class="card show"><div>
+      <h1>BLASTER RANGE</h1>
+      <p>One minute. Pop every target you can. Pick your blaster:</p>
+      <div id="picker"></div>
+      <p id="title-best"></p>
+    </div></div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

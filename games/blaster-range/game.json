@@ -1,0 +1,15 @@
+{
+  "title": "Blaster Range",
+  "description": "A minute on the foam-dart range: pick a blaster, then pop the targets as they flip up, slide along rails and peek out of crates. Bullseyes score most, and hits in a row build a combo.",
+  "thumbnail": "3D assets/Blaster Kit/Preview.png",
+  "assets": [
+    "3D assets/Blaster Kit/Models/GLB format/{blaster-a,blaster-d,blaster-f,blaster-h,bullet-foam,bullet-foam-tip,target-large,target-small,target-fragment-large,target-fragment-small,crate-medium,crate-wide,crate-small,clip-small,smoke}.glb",
+    "3D assets/Blaster Kit/Models/GLB format/Textures/colormap.png",
+    "Audio/Foley Sounds/Audio/Woosh/woosh[1-3].ogg",
+    "Audio/Impact Sounds/Audio/{impactPlate_light,impactWood_light,impactSoft_medium}_00[0-2].ogg",
+    "Audio/Interface Sounds/Audio/{switch_002,switch_004,click_001,click_002,error_008,maximize_004,tick_002,confirmation_004}.ogg",
+    "Audio/Digital Audio/Audio/{lowThreeTone,pepSound2,pepSound4}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{go,time_over,new_highscore,hurry_up}.ogg",
+    "Audio/Music Loops/Loops/Mission Plausible.ogg"
+  ]
+}
