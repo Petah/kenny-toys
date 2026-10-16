@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:," />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>UFO Defense</title>
+    <style>
+      html:root { --bg: #8fcfe8; --shade: #2b3355; --gold: #ffd23f; }
+      body { overflow: hidden; user-select: none; -webkit-user-select: none; }
+      #stage { position: fixed; inset: 0; touch-action: none; }
+      .hud { position: fixed; z-index: 4; pointer-events: none; color: #fff; font-family: 'Kenney Bold', sans-serif;
+        text-shadow: 0 3px 0 var(--shade), 0 -2px 0 var(--shade), 2px 0 0 var(--shade), -2px 0 0 var(--shade); }
+      #stats { top: 12px; left: 160px; display: flex; gap: 18px; font-size: 26px; align-items: center; }
+      #stats span { display: inline-flex; align-items: center; gap: 6px; }
+      #stats small { font-size: 13px; color: var(--gold); margin-right: 2px; }
+      .coin-dot { width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff3a0, #ffc21a 55%, #c98a00); box-shadow: 0 2px 0 var(--shade); }
+      .heart-dot { width: 20px; height: 18px; background: #ff5a6e; clip-path: path('M10 18 C4 13 0 10 0 5.5 A5 5 0 0 1 10 3.5 A5 5 0 0 1 20 5.5 C20 10 16 13 10 18Z'); }
+      #controls { position: fixed; z-index: 5; top: 12px; right: 12px; display: flex; gap: 8px; }
+      #controls .btn { font-size: 16px; }
+      #wave-btn.ready { background: #e8473a; animation: nudge 1s infinite alternate; }
+      @keyframes nudge { to { transform: scale(1.06); } }
+      #banner { top: 26%; left: 50%; transform: translate(-50%, -50%) scale(0.4); font-size: clamp(34px, 8vw, 64px); opacity: 0;
+        transition: transform 0.3s cubic-bezier(.2,1.6,.4,1), opacity 0.2s; white-space: nowrap; text-align: center; }
+      #banner.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      #banner small { display: block; font-size: 0.4em; color: var(--gold); }
+      #hint { bottom: 16px; left: 50%; transform: translateX(-50%); font-size: clamp(13px, 2.4vw, 17px); color: var(--gold); text-align: center; max-width: 92vw; width: max-content; opacity: 0; transition: opacity 0.5s; }
+      #hint.show { opacity: 1; }
+      .pop { position: fixed; z-index: 5; pointer-events: none; font: 20px 'Kenney Bold', sans-serif; color: #fff; transform: translate(-50%, -50%); white-space: nowrap;
+        text-shadow: 0 2px 0 var(--shade), 0 -2px 0 var(--shade), 2px 0 0 var(--shade), -2px 0 0 var(--shade); animation: pop 1s ease-out forwards; }
+      .pop.coin { color: var(--gold); }
+      .pop.bad { color: #ff8a7a; font-size: 30px; }
+      @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; } 15% { transform: translate(-50%, -60%) scale(1.1); opacity: 1; }
+        70% { opacity: 1; } 100% { transform: translate(-50%, -170%) scale(1); opacity: 0; } }
+      .panel { position: fixed; z-index: 6; display: none; background: #2b3355ee; border: 3px solid rgba(255,255,255,0.4); border-radius: 16px; padding: 8px; color: #fff;
+        font-family: 'Kenney Bold', sans-serif; box-shadow: 0 6px 0 rgba(0,0,0,0.25); }
+      .panel.show { display: block; }
+      #build-options { display: grid; grid-template-columns: repeat(4, 84px); gap: 6px; }
+      #build-options button { display: grid; justify-items: center; padding: 4px 2px 6px; background: #4a5590; gap: 1px; }
+      #build-options button:disabled { opacity: 0.45; filter: grayscale(0.6); }
+      #build-options img { width: 64px; height: 64px; }
+      #build-options b { font-size: 14px; font-weight: normal; }
+      #build-options small { font: 9px 'Kenney Future', sans-serif; color: #c9d2ff; }
+      .cost { color: var(--gold); font-size: 14px; }
+      .cost::before { content: ''; display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: #ffc21a; margin-right: 4px; vertical-align: -1px; }
+      #tower { min-width: 200px; text-align: center; }
+      #tower-name { font-size: 18px; margin-bottom: 8px; }
+      #tower .btn { font-size: 15px; margin: 0 3px; }
+      #upgrade { background: #2fb36b; }
+      #upgrade:disabled { opacity: 0.5; }
+      .card { position: fixed; z-index: 7; inset: 0; display: none; place-items: center; background: rgba(30, 30, 60, 0.4); }
+      .card.show { display: grid; }
+      .card > div { background: #4a5590; border: 4px solid rgba(255,255,255,0.45); border-radius: 22px; padding: 22px 26px 18px; color: #fff;
+        font-family: 'Kenney Bold', sans-serif; text-align: center; max-width: 94vw; box-shadow: 0 10px 0 rgba(0,0,0,0.25); }
+      .card h1 { margin: 0 0 6px; font-size: clamp(44px, 10vw, 80px); font-weight: normal; line-height: 1;
+        text-shadow: 0 5px 0 var(--shade), 0 -3px 0 var(--shade), 3px 0 0 var(--shade), -3px 0 0 var(--shade); }
+      .card h2 { margin: 0 0 10px; font-size: clamp(30px, 7vw, 46px); font-weight: normal; }
+      .card p { margin: 8px 0 14px; color: var(--gold); max-width: 420px; }
+      .card .stats { display: flex; gap: 22px; justify-content: center; margin: 0 0 12px; }
+      .card .stats div { font-size: clamp(28px, 7vw, 40px); }
+      .card .stats small { display: block; font-size: 13px; color: var(--gold); }
+      .card .btn { font-size: 22px; padding: 12px 34px; }
+      @media (max-width: 600px) {
+        #stats { top: 56px; left: 14px; font-size: 22px; gap: 14px; }
+        #controls { top: auto; bottom: 12px; right: 12px; }
+        #controls .btn { font-size: 14px; padding: 9px 12px; }
+        #hint { bottom: 64px; }
+        #build-options { grid-template-columns: repeat(2, 84px); }
+        #build-options b { font-size: 12px; }
+      }
+      body.on-title .hud, body.on-title #controls { display: none !important; }
+    </style>
+  </head>
+  <body class="on-title">
+    <div id="stage"></div>
+    <div id="stats" class="hud">
+      <span><i class="coin-dot"></i><b id="coins">0</b></span>
+      <span><i class="heart-dot"></i><b id="lives">20</b></span>
+      <span><small>WAVE</small><b id="wave">1/15</b></span>
+    </div>
+    <div id="controls"><button id="speed-btn" class="btn">1×</button><button id="wave-btn" class="btn">Send first wave</button></div>
+    <div id="banner" class="hud"></div>
+    <div id="hint" class="hud"></div>
+    <div id="build" class="panel"><div id="build-options"></div></div>
+    <div id="tower" class="panel"><div id="tower-name"></div><button id="upgrade" class="btn">Upgrade</button><button id="sell" class="btn">Sell</button></div>
+    <div id="over" class="card"><div>
+      <h2 id="over-title">Castle saved!</h2>
+      <div class="stats"><div><span id="over-wave">0</span><small>WAVE</small></div><div><span id="over-lives">0</span><small>LIVES LEFT</small></div><div><span id="over-score">0</span><small>SCORE</small></div></div>
+      <p id="over-note"></p>
+      <button id="over-go" class="btn">Play again</button>
+    </div></div>
+    <div id="title" class="card show"><div>
+      <h1>UFO DEFENSE</h1>
+      <p>Flying saucers are heading down the road to your castle. Build towers beside it, upgrade them, and hold out for fifteen waves.</p>
+      <button id="title-play" class="btn">Defend!</button>
+      <p id="title-best"></p>
+    </div></div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

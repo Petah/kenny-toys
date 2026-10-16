@@ -1,0 +1,19 @@
+{
+  "title": "UFO Defense",
+  "description": "Flying saucers are heading down the dirt road to your castle. Build turrets, cannons, ballistas and catapults beside the road, upgrade them into tall towers, and hold out for fifteen waves.",
+  "thumbnail": "3D assets/Tower Defense Kit/Sample.png",
+  "assets": [
+    "3D assets/Tower Defense Kit/Models/GLB format/{tile,tile-straight,tile-corner-round,tile-end,tile-spawn-end,tile-tree,tile-tree-double,tile-tree-quad,tile-rock,tile-crystal,tile-hill,tile-dirt}.glb",
+    "3D assets/Tower Defense Kit/Models/GLB format/tower-{round,square}-{bottom-a,middle-a,top-a,roof-a}.glb",
+    "3D assets/Tower Defense Kit/Models/GLB format/{weapon-turret,weapon-cannon,weapon-ballista,weapon-catapult,weapon-ammo-bullet,weapon-ammo-cannonball,weapon-ammo-arrow,weapon-ammo-boulder}.glb",
+    "3D assets/Tower Defense Kit/Models/GLB format/{enemy-ufo-a,enemy-ufo-b,enemy-ufo-c,enemy-ufo-d,enemy-ufo-beam,selection-a,spawn-round,detail-tree,detail-rocks,detail-crystal}.glb",
+    "3D assets/Tower Defense Kit/Models/GLB format/Textures/colormap.png",
+    "Audio/Sci-Fi Sounds/Audio/{laserSmall_000,laserSmall_001,laserRetro_002,explosionCrunch_000,explosionCrunch_001,explosionCrunch_002,lowFrequency_explosion_000,forceField_000,impactMetal_000,impactMetal_001,thrusterFire_002}.ogg",
+    "Audio/Impact Sounds/Audio/impactPlank_medium_00[0-2].ogg",
+    "Audio/Retro Sounds 2/Audio/{coin1,coin2}.ogg",
+    "Audio/Digital Audio/Audio/{powerUp3,phaserDown2}.ogg",
+    "Audio/Interface Sounds/Audio/{click_001,click_002,error_004,confirmation_002,minimize_004}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{go,you_win,game_over,new_highscore,final_round}.ogg",
+    "Audio/Music Loops/Loops/Space Cadet.ogg"
+  ]
+}
