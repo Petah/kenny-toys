@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 /**
- * Sharp HUD icons drawn from the 3D models themselves (the kits' preview PNGs are only 64px,
+ * Sharp HUD icons drawn from 3D models (the kits' preview PNGs are only 64px,
  * which blurs on a retina screen). One small offscreen renderer draws them all once.
  */
 export function makeIcons(models: Record<string, THREE.Object3D>, size = 160) {

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:," />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Train Switcher</title>
+    <style>
+      html:root { --bg: #9ad7ef; --ink: #ffffff; --shade: #2b3d5a; --gold: #ffe27a; }
+      body { overflow: hidden; user-select: none; -webkit-user-select: none; }
+      #stage { position: fixed; inset: 0; touch-action: none; }
+      .hud { position: fixed; z-index: 4; pointer-events: none; color: var(--ink); font-family: 'Kenney Bold', sans-serif;
+        text-shadow: 0 3px 0 var(--shade), 0 -2px 0 var(--shade), 2px 0 0 var(--shade), -2px 0 0 var(--shade); }
+      #score { top: 58px; left: 16px; font-size: clamp(36px, 7vw, 54px); line-height: 1; }
+      #score-label { top: calc(62px + clamp(36px, 7vw, 54px)); left: 18px; font-size: 13px; color: var(--gold); }
+      #top { top: 12px; left: 50%; transform: translateX(-50%); text-align: center; }
+      #stage-name { font-size: clamp(18px, 3.4vw, 24px); white-space: nowrap; }
+      #stage-name small { font-size: 0.65em; color: var(--gold); margin-left: 4px; }
+      #pips { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 6px; max-width: min(60vw, 330px); }
+      #pips i { width: 12px; height: 12px; border-radius: 50%; background: rgba(43, 61, 90, 0.35); border: 2px solid rgba(255, 255, 255, 0.85); }
+      #pips i.ok { background: #5fd35a; }
+      #pips i.bad { background: #ff5a4e; }
+      #hearts { top: 12px; right: 14px; display: flex; gap: 4px; }
+      #hearts svg { width: 32px; height: 30px; fill: #ff5a6e; stroke: #fff; stroke-width: 2.2; filter: drop-shadow(0 3px 0 var(--shade));
+        transition: transform 0.3s, opacity 0.3s, fill 0.3s; }
+      #hearts svg.lost { fill: #6d7180; opacity: 0.55; transform: scale(0.8); }
+      #next { top: 52px; right: 14px; display: flex; align-items: center; gap: 8px; font-size: 15px; opacity: 0; transition: opacity 0.3s; }
+      #next.show { opacity: 1; }
+      #next img { width: 50px; height: 50px; border-radius: 12px; background: rgba(255, 255, 255, 0.55); border: 4px solid #fff; transition: border-color 0.2s; }
+      #banner { top: 34%; left: 50%; transform: translate(-50%, -50%) scale(0.4); font-size: clamp(40px, 10vw, 84px); opacity: 0;
+        transition: transform 0.3s cubic-bezier(.2,1.6,.4,1), opacity 0.2s; white-space: nowrap; text-align: center; }
+      #banner.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      #banner small { display: block; font-size: 0.36em; color: var(--gold); }
+      #hint { bottom: 16px; left: 50%; transform: translateX(-50%); font-size: clamp(13px, 2.4vw, 17px); color: var(--gold); width: max-content; max-width: 92vw; text-align: center; transition: opacity 0.6s; }
+      @media (max-width: 560px) {
+        #top { top: 54px; }
+        #pips { max-width: 170px; }
+        #stage-name { font-size: 17px; }
+        #next .label { display: none; }
+      }
+      .pop { position: fixed; z-index: 5; pointer-events: none; font: 34px 'Kenney Bold', sans-serif; transform: translate(-50%, -50%);
+        text-shadow: 0 3px 0 #fff, 0 -2px 0 #fff, 2px 0 0 #fff, -2px 0 0 #fff; animation: pop 1.1s ease-out forwards; }
+      @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; } 15% { transform: translate(-50%, -60%) scale(1.2); opacity: 1; }
+        70% { opacity: 1; } 100% { transform: translate(-50%, -190%) scale(1); opacity: 0; } }
+      .card { position: fixed; z-index: 6; inset: 0; display: none; place-items: center; background: rgba(30, 50, 80, 0.35); }
+      .card.show { display: grid; }
+      .card > div { background: #3f6fb0; border: 4px solid rgba(255,255,255,0.45); border-radius: 22px; padding: 22px 26px 18px; color: #fff;
+        font-family: 'Kenney Bold', sans-serif; text-align: center; max-width: 94vw; box-shadow: 0 10px 0 rgba(0,0,0,0.25); }
+      .card h2 { margin: 0 0 10px; font-size: clamp(30px, 7vw, 46px); font-weight: normal; }
+      .card .stats { display: flex; gap: 22px; justify-content: center; margin: 0 0 12px; }
+      .card .stats div { font-size: clamp(30px, 7vw, 42px); }
+      .card .stats small { display: block; font-size: 14px; color: var(--gold); }
+      .card p { margin: 0 0 14px; color: var(--gold); }
+      .card .btn { font-size: 22px; padding: 12px 34px; }
+      #title { background: none; place-items: end center; padding-bottom: 6vh; }
+      #title > div { background: none; border: none; box-shadow: none; text-shadow: 0 5px 0 var(--shade), 0 -3px 0 var(--shade), 3px 0 0 var(--shade), -3px 0 0 var(--shade); }
+      #title h1 { margin: 0 0 14px; font-size: clamp(48px, 11vw, 96px); font-weight: normal; line-height: 1; }
+      #title .btn { font-size: 26px; padding: 14px 44px; text-shadow: none; }
+      #title p { margin: 12px 0 0; }
+      #title .keys { font-family: 'Kenney Future', sans-serif; font-size: 14px; color: #fff; }
+      @media (pointer: coarse) { #title .keys.mouse { display: none; } }
+      @media (pointer: fine) { #title .keys.touch { display: none; } }
+      body.on-title .hud { display: none !important; }
+    </style>
+  </head>
+  <body class="on-title">
+    <div id="stage"></div>
+    <div id="score" class="hud">0</div>
+    <div id="score-label" class="hud">TRAINS HOME</div>
+    <div id="top" class="hud"><div id="stage-name"></div><div id="pips"></div></div>
+    <div id="hearts" class="hud"></div>
+    <div id="next" class="hud"><span class="label">NEXT</span> <img id="next-icon" alt="" /></div>
+    <div id="banner" class="hud"></div>
+    <div id="hint" class="hud"></div>
+    <div id="over" class="card"><div>
+      <h2 id="over-title">Yard closed!</h2>
+      <div class="stats"><div><span id="over-score">0</span><small>TRAINS HOME</small></div><div><span id="over-stage">1</span><small>STAGE</small></div></div>
+      <p id="over-note"></p>
+      <button id="over-go" class="btn">Again</button>
+    </div></div>
+    <div id="title" class="card show"><div>
+      <h1>TRAIN SWITCHER</h1>
+      <button id="title-play" class="btn">Start</button>
+      <p id="title-best"></p>
+      <p class="keys mouse">Click switches (or press their numbers) to send each train to the shed of its colour</p>
+      <p class="keys touch">Tap switches to send each train to the shed of its colour</p>
+    </div></div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

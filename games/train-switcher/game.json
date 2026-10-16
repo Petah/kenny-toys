@@ -1,0 +1,18 @@
+{
+  "title": "Train Switcher",
+  "description": "Trains roll out of the tunnel carrying red, blue, green and yellow cargo. Flip the switches to send each one into the shed of its colour, as the yard grows and the trains speed up.",
+  "thumbnail": "3D assets/Train Kit/Preview.png",
+  "assets": [
+    "3D assets/Train Kit/Models/GLB format/railroad-{straight,corner-small}.glb",
+    "3D assets/Train Kit/Models/GLB format/train-{diesel-a,diesel-b,diesel-c,locomotive-a,locomotive-b,locomotive-c}.glb",
+    "3D assets/Train Kit/Models/GLB format/train-carriage-{container-red,container-blue,container-green,tank,lumber,coal}.glb",
+    "3D assets/Train Kit/Models/GLB format/Textures/colormap.png",
+    "3D assets/Nature Kit/Models/GLTF format/{tree_default,tree_oak,tree_cone,tree_fat,tree_pineRoundA,tree_pineRoundC,rock_largeA,rock_largeC,rock_smallA,rock_smallC,flower_redA,flower_yellowA,flower_purpleA,grass,grass_large,plant_bush,cliff_block_rock,cliff_cave_rock,cliff_top_rock,cliff_large_rock}.glb",
+    "Audio/UI Audio/Audio/switch{2,3,5,7}.ogg",
+    "Audio/Interface Sounds/Audio/{confirmation_001,confirmation_002,error_006,error_008,click_001,click_002,tick_002}.ogg",
+    "Audio/Impact Sounds/Audio/impactBell_heavy_00[0-2].ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{go,level_up,game_over,new_highscore}.ogg",
+    "Audio/Music Jingles/Audio (Steeldrum)/jingles-steel_{00,04,09}.ogg",
+    "Audio/Music Loops/Loops/Polka Train.ogg"
+  ]
+}

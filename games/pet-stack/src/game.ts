@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import type { Sounds } from '@shared/audio';
 import { load, save } from '@shared/storage';
 import { MUSIC } from './assets.ts';
-import { makeIcons } from './icons.ts';
+import { makeIcons } from '@shared/model-icons';
 import { PETS, type PetKind } from './pets.ts';
 import { DROP_GAP, PEDESTAL_HALF, PEDESTAL_HEIGHT, STEP, Stack, extent, type Pet, type PetShape } from './stack.ts';
 
