@@ -1,0 +1,17 @@
+{
+  "title": "Tiny Crawler",
+  "description": "A turn-based dungeon crawl in tiny pixel art: one room per floor. Bump monsters to fight them, open chests (careful, some bite back), drink potions, find better weapons, and see how deep you get.",
+  "thumbnail": "2D assets/Tiny Dungeon/Sample.png",
+  "assets": [
+    "2D assets/Tiny Dungeon/Tilemap/tilemap_packed.png",
+    "Other/Fonts/Kenney Pixel.ttf",
+    "Audio/RPG Audio/Audio/{footstep00,footstep01,footstep02,footstep03,knifeSlice,knifeSlice2,drawKnife1,creak1,metalLatch,handleCoins,handleCoins2,doorOpen_1,beltHandle1,bookFlip1}.ogg",
+    "Audio/Impact Sounds/Audio/impactPunch_medium_00[0-2].ogg",
+    "Audio/Impact Sounds/Audio/impactSoft_heavy_00[0-1].ogg",
+    "Audio/Interface Sounds/Audio/{error_005,click_001,confirmation_003}.ogg",
+    "Audio/Retro Sounds 2/Audio/{hurt1,lose2,upgrade1}.ogg",
+    "Audio/Music Jingles/Audio (Retro)/jingles-retro_{03,06}.ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{game_over,new_highscore}.ogg",
+    "Audio/Music Loops/Loops/Infinite Descent.ogg"
+  ]
+}

@@ -114,7 +114,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | ✅ | Tappy Plane | **Tappy Plane**: Flappy Bird (the pack ships GET READY / GAME OVER art). |
 | | Tank Pack | **Tank Duel**: two-player artillery, Worms-lite. |
 | | Tiny Battle | **Tiny Tactics**: turn-based squad battle on a tiny grid. |
-| | Tiny Dungeon | **Tiny Crawler**: one-floor dungeon crawl with keys and chests. |
+| ✅ | Tiny Dungeon | **Tiny Crawler**: one-floor dungeon crawl with keys and chests. |
 | | Tiny Farm | **Tiny Harvest**: plant, grow and sell crops. |
 | ✅ | Tiny Ski | Used in **Downhill**: SkiFree-style endless slope, with the yeti. |
 | | Tiny Town | **Tiny Village**: top-down walk-and-talk village. |
