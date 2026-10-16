@@ -110,7 +110,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | ✅ | Sokoban Pack | Used in **Sokoban**: push crates onto targets. |
 | | Space Shooter Remastered / Extension | **Space Blaster**: horizontal or vertical space shooter with power-ups. |
 | ✅ | Splat Pack | Used in **Donut Splat**; also **Paint Splatter**, a pure splat-painting toy. |
-| | Sports Pack | **Penalty Kicks**: flick shots past a keeper. |
+| ✅ | Sports Pack | **Penalty Kicks**: flick shots past a keeper. |
 | ✅ | Tappy Plane | **Tappy Plane**: Flappy Bird (the pack ships GET READY / GAME OVER art). |
 | | Tank Pack | **Tank Duel**: two-player artillery, Worms-lite. |
 | | Tiny Battle | **Tiny Tactics**: turn-based squad battle on a tiny grid. |
