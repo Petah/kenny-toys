@@ -137,7 +137,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Car Kit | **Car Lot**: pick a car and drift around a car park. |
 | | Castle Kit | **Castle Siege**: build walls, then catapult the opponent's. |
 | | City Kit (Commercial / Industrial / Roads / Suburban) | **Pocket City**: drop roads and buildings into a mini city. |
-| 🎯 | Coaster Kit | **Coaster Builder**: lay track, then ride it first-person. |
+| ✅ | Coaster Kit | **Coaster Builder**: lay track, then ride it first-person. |
 | ✅ | Cube Pets | **Pet Stack**: drop cube animals onto a wobbling tower. |
 | | Factory Kit | **Conveyor Puzzle**: route items through conveyors and machines. |
 | | Fantasy Town Kit | **Fantasy Village**: build a cosy fantasy village with a windmill. |
