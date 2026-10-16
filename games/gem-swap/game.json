@@ -1,0 +1,15 @@
+{
+  "title": "Gem Swap",
+  "description": "Ninety seconds of match-three: swap neighbouring gems to line up three or more. Four in a line makes a gem that clears a row, an L or T makes a bomb, five makes a rainbow that clears a whole colour. Chain cascades for big scores.",
+  "thumbnail": "2D assets/Puzzle Pack 2/Preview.png",
+  "assets": [
+    "2D assets/Puzzle Pack 2/Spritesheet/spritesheet_tiles{Red,Oranges,Yellow,Green,Blue,Pink,Grey}.{png,xml}",
+    "2D assets/Puzzle Pack 2/Spritesheet/spritesheet_particles.{png,xml}",
+    "Audio/Interface Sounds/Audio/{select_001,select_004,error_004,click_001,click_002,tick_002,maximize_003,glass_001,glass_002,glass_003}.ogg",
+    "Audio/Digital Audio/Audio/{powerUp4,powerUp9,phaserUp3,zapThreeToneUp,lowThreeTone}.ogg",
+    "Audio/Impact Sounds/Audio/impactSoft_heavy_00[0-2].ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{go,time_over,new_highscore,hurry_up}.ogg",
+    "Audio/Music Jingles/Audio (Pizzicato)/jingles-pizzicato_{02,05}.ogg",
+    "Audio/Music Loops/Loops/Wacky Waiting.ogg"
+  ]
+}

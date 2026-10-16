@@ -85,7 +85,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Platformer Pack Remastered | **Remastered Run**: polished one-level platformer showcase. |
 | ✅ | Playing Cards Pack | **Blackjack**: fifteen hands from $500 at a pixel card table. |
 | | Prototype Textures | *(utility)*: grid textures for blockouts. |
-| | Puzzle Pack 1 / 2 | **Gem Swap**: match-3 with the pack's coloured gems. |
+| ✅ | Puzzle Pack 1 / 2 | **Gem Swap**: match-3 with the pack's coloured gems. |
 | | Racing Pack | **Top-Down Racer**: Micro Machines-style track racing. |
 | | Ranks Pack | **Rank Up**: progression badges shown across all games. |
 | | Retro Textures Fantasy | **Wall Paint**: Wolfenstein-style raycaster corridor with fantasy textures. |
