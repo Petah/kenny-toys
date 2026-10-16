@@ -1,0 +1,17 @@
+{
+  "title": "Burger Stack",
+  "description": "Burger fixings rain down on the grill counter. Slide the plate to catch them in the order on the ticket: bun, patty, cheese, lettuce… finish with the top bun and it's served. Catch the wrong thing and it's in the bin. How many can you serve before the shift ends?",
+  "thumbnail": "3D assets/Food Kit/Preview.png",
+  "assets": [
+    "3D assets/Food Kit/Models/GLB format/{burger,burger-cheese-double,bacon,egg-cooked,fish-bones,soda-can-crushed,candy-bar-wrapper,plate,bottle-ketchup,bottle-musterd,pot-stew-lid,frying-pan,knife-block,cutting-board,pepper-mill,shaker-salt,shaker-pepper,mug,soda-bottle,fries,hot-dog,cup-coffee,bowl-soup}.glb",
+    "3D assets/Food Kit/Models/GLB format/Textures/colormap.png",
+    "Audio/Impact Sounds/Audio/impactSoft_medium_00[0-4].ogg",
+    "Audio/Impact Sounds/Audio/impactBell_heavy_00[0-1].ogg",
+    "Audio/Interface Sounds/Audio/{error_004,click_001,click_002,tick_002,drop_002,drop_003,maximize_006}.ogg",
+    "Audio/Casino Audio/Audio/chips-collide-[1-3].ogg",
+    "Audio/Foley Sounds/Audio/Woosh/woosh[1-3].ogg",
+    "Audio/Voiceover Pack/Audio (Female)/{go,time_over,new_highscore,hurry_up}.ogg",
+    "Audio/Music Jingles/Audio (Saxophone)/jingles-saxophone_{00,03}.ogg",
+    "Audio/Music Loops/Loops/Swinging Pants.ogg"
+  ]
+}

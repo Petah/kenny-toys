@@ -141,7 +141,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | ✅ | Cube Pets | **Pet Stack**: drop cube animals onto a wobbling tower. |
 | | Factory Kit | **Conveyor Puzzle**: route items through conveyors and machines. |
 | | Fantasy Town Kit | **Fantasy Village**: build a cosy fantasy village with a windmill. |
-| 🎯 | Food Kit | **Burger Stack**: catch falling ingredients in order-ticket order. |
+| ✅ | Food Kit | **Burger Stack**: catch falling ingredients in order-ticket order. |
 | | Furniture Kit | **Room Decorator**: furnish an isometric room. |
 | | Graveyard Kit | **Spooky Night**: dodge ghosts across a graveyard to the crypt. |
 | | Hexagon Kit | **Hex Islands**: 3D hex-tile island builder. |
