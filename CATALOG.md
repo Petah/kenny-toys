@@ -17,7 +17,7 @@ Every pack in `../Kenney Game Assets All-in-1 3.7.0`, each with a one-line pitch
 | | Background Elements / Remastered | **Parallax Painter**: build a layered parallax scene and scroll through it. |
 | | Block Pack / Block Pack (Pixel) | **Tetromino Drop**: Tetris variant using the pack's coloured blocks. |
 | | Boardgame Pack | **Ludo Dash**: quick 2-player dice race with pawns and dice from the pack. |
-| | Brick Pack | **Brick Breaker**: Breakout with chunky bricks and paddle. |
+| ✅ | Brick Pack | **Brick Breaker**: Breakout with chunky bricks and paddle. |
 | | Cartography Pack | **Treasure Map**: draw a route on an inked parchment map and dig for the X. |
 | | Character Pack (+ Facial Hair) | **Dress-Up**: mix heads, hair, beards and clothes into a character, then export. |
 | | Crosshair Pack | **Aim Trainer**: targets pop up and you click them fast, tracking reaction-time stats. |

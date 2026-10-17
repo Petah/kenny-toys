@@ -1,0 +1,16 @@
+{
+  "title": "Brick Breaker",
+  "description": "Breakout with chunky toy bricks: steer the paddle to bounce the ball up into ten walls of bricks. Black bricks take two hits, stone never breaks, crates explode, and the little characters drop multi-ball, a wide paddle, slow motion or an extra life.",
+  "thumbnail": "2D assets/Brick Pack/Preview.png",
+  "assets": [
+    "2D assets/Brick Pack/PNG/Double/{Red,Yellow,Blue,Green,White,Black}/brick_low_{1,2,4,6}.png",
+    "2D assets/Brick Pack/PNG/Double/Special/extra_{character_a,character_b,character_c,character_d,character_e,crate_explosive,stone}.png",
+    "Audio/Interface Sounds/Audio/{select_002,pluck_001,pluck_002,tick_001,tick_004,drop_001,drop_002,drop_003,drop_004,maximize_006}.ogg",
+    "Audio/Impact Sounds/Audio/{impactSoft_medium_00[0-2],impactPlate_light_00[0-2],impactPlate_heavy_00[0-1],impactMining_00[0-1]}.ogg",
+    "Audio/Digital Audio/Audio/{powerUp2,powerUp7,phaserDown2}.ogg",
+    "Audio/Retro Sounds 2/Audio/{explosion1,explosion2,coin2}.ogg",
+    "Audio/Voiceover Pack/Audio (Male)/{power_up,level_up,go,game_over,new_highscore}.ogg",
+    "Audio/Music Jingles/Audio (Steeldrum)/jingles-steel_{04,09}.ogg",
+    "Audio/Music Loops/Loops/Alpha Dance.ogg"
+  ]
+}
