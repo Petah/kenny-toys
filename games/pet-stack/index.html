@@ -62,22 +62,23 @@
       /* Party play: the TV's lobby, player strip and results. */
       body.party #hearts, body.party #touch, body.party #hint { display: none !important; }
       body:not(.party) #seats, body:not(.party) #who { display: none !important; }
-      #lobby, #results { background: rgba(30, 60, 40, 0.25); place-items: start center; padding-top: 5vh; overflow: auto; }
-      #lobby > div, #results > div { width: min(860px, 94vw); padding: 24px 30px 20px; }
-      #lobby h2 { font-size: clamp(30px, 4.6vw, 52px); }
-      .lobby-row { display: flex; gap: 28px; align-items: center; justify-content: center; margin: 4px 0 16px; }
-      #lobby-qr { width: clamp(150px, 22vw, 230px); aspect-ratio: 1; background: #fff; border-radius: 14px; padding: 6px; flex: none; }
+      #lobby, #results { background: rgba(30, 60, 40, 0.25); place-items: start center; padding-top: 3vh; overflow: auto; }
+      #lobby > div, #results > div { width: min(900px, 94vw); padding: min(24px, 2.4vh) 30px min(20px, 2vh); }
+      #lobby p, #results p { margin-bottom: min(14px, 1.6vh); }
+      #lobby h2 { font-size: clamp(28px, min(4.6vw, 7vh), 52px); margin-bottom: 0.1em; }
+      .lobby-row { display: flex; gap: 28px; align-items: center; justify-content: center; margin: 4px 0 min(16px, 2vh); }
+      #lobby-qr { width: clamp(120px, min(22vw, 26vh), 260px); aspect-ratio: 1; background: #fff; border-radius: 14px; padding: 6px; flex: none; }
       #lobby-qr svg { display: block; width: 100%; height: 100%; }
       .lobby-join { text-align: left; }
       .lobby-join p { margin: 0 0 4px; font-size: clamp(14px, 1.8vw, 20px); }
-      .lobby-join .url { font-size: clamp(18px, 2.6vw, 30px); margin-bottom: 18px; word-break: break-all; }
-      .lobby-join .code { font-size: clamp(54px, 9vw, 104px); letter-spacing: 0.12em; line-height: 1; margin-top: 0.22em; color: #fff;
+      .lobby-join .url { font-size: clamp(16px, min(2.4vw, 4vh), 30px); margin-bottom: 0.7em; white-space: nowrap; }
+      .lobby-join .code { font-size: clamp(44px, min(9vw, 11vh), 120px); letter-spacing: 0.12em; line-height: 1; margin-top: 0.22em; color: #fff;
         text-shadow: 0 5px 0 var(--shade); }
       .lobby-rules { font-family: 'Kenney Future', sans-serif; font-size: clamp(13px, 1.6vw, 17px); color: #fff !important; }
-      .chips { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 0; margin: 0 0 14px; min-height: 58px; }
+      .chips { list-style: none; display: flex; flex-wrap: wrap; gap: min(10px, 1.2vh) 10px; justify-content: center; padding: 0; margin: 0 0 min(14px, 1.6vh); min-height: 40px; }
       .chips li { display: flex; align-items: center; gap: 8px; padding: 5px 16px 5px 6px; border-radius: 30px; background: rgba(0,0,0,0.22);
-        border: 3px solid var(--seat); font-size: clamp(18px, 2.2vw, 24px); animation: pop 0.35s cubic-bezier(.2,1.6,.4,1); }
-      .chips li img { width: 44px; height: 44px; }
+        border: 3px solid var(--seat); font-size: clamp(16px, min(2.2vw, 3.3vh), 24px); animation: pop 0.35s cubic-bezier(.2,1.6,.4,1); }
+      .chips li img { width: min(44px, 5.5vh); height: min(44px, 5.5vh); }
       .chips li.offline { opacity: 0.4; }
       .chips li b { color: var(--gold); font-weight: normal; min-width: 1.2em; }
       #results-list { flex-direction: column; align-items: center; }

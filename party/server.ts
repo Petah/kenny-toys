@@ -34,8 +34,12 @@ const HOST_GRACE_MS = 10 * 60_000;
 const IDLE_MS = 3 * 60 * 60_000;
 /** Cloudflare drops sockets quiet for 100s, so everyone gets pinged well inside that. */
 const PING_MS = 25_000;
-/** Messages per second a socket may send before the extras are dropped. */
-const RATE = 40;
+/**
+ * Messages per second a socket may send before the extras are dropped. The host gets far more:
+ * it sends every phone its own state at once, plus pictures the first time.
+ */
+const PLAYER_RATE = 40;
+const HOST_RATE = 600;
 
 interface Player {
   id: string;
@@ -70,13 +74,13 @@ function newCode() {
   }
 }
 
-/** A token bucket per socket: true while it's within RATE messages a second. */
-function limiter() {
-  let tokens = RATE;
+/** A token bucket per socket: true while it's within `rate` messages a second. */
+function limiter(rate: number) {
+  let tokens = rate;
   let at = Date.now();
   return () => {
     const now = Date.now();
-    tokens = Math.min(RATE, tokens + ((now - at) / 1000) * RATE);
+    tokens = Math.min(rate, tokens + ((now - at) / 1000) * rate);
     at = now;
     if (tokens < 1) return false;
     tokens--;
@@ -136,7 +140,7 @@ function attachHost(ws: WebSocket, url: URL) {
     players: [...r.players.values()].map((p) => ({ id: p.id, name: p.name, online: !!p.ws })),
   });
 
-  const ok = limiter();
+  const ok = limiter(HOST_RATE);
   ws.on('message', (raw) => {
     if (r.host !== ws || !ok()) return;
     const msg = parse(raw);
@@ -190,7 +194,7 @@ function attachPlayer(ws: WebSocket, url: URL) {
   if (!room.host) send(ws, { t: 'host-gone' });
   send(room.host, { t: 'join', id, name: p.name });
 
-  const ok = limiter();
+  const ok = limiter(PLAYER_RATE);
   ws.on('message', (raw) => {
     if (p.ws !== ws || !ok()) return;
     const data = parse(raw);
