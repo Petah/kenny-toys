@@ -5,8 +5,9 @@
 #
 # The static games go out with deploy.sh; this is only the small Node service that TV + phone
 # games talk through, so it's needed only when party/ changes. Like deploy.sh it ships the
-# committed HEAD. Node runs server.ts directly (type stripping), so there's no build: a release is
-# server.ts, a package.json and the one dependency, ws (the unit runs Node with type stripping on). The first run also creates the service
+# committed HEAD. The server's Node (Ubuntu's build) can't strip TypeScript itself, so this Mac's
+# Node strips the types to give server.js; a release is that, a package.json and the one
+# dependency, ws. The first run also creates the service
 # user and installs the systemd unit. It needs root over SSH, since the deploy user can't manage
 # services.
 set -euo pipefail
@@ -26,7 +27,10 @@ WS_VERSION="$(node -p "require('./node_modules/ws/package.json').version")"
 
 STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
-git show "HEAD:party/server.ts" > "$STAGE/server.ts"
+git show "HEAD:party/server.ts" | node -e "
+  const src = require('node:fs').readFileSync(0, 'utf8');
+  process.stdout.write(require('node:module').stripTypeScriptTypes(src));
+" > "$STAGE/server.js"
 printf '{ "name": "kenney-party", "private": true, "type": "module" }\n' > "$STAGE/package.json"
 mkdir -p "$STAGE/node_modules"
 cp -R node_modules/ws "$STAGE/node_modules/ws"

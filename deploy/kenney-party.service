@@ -12,8 +12,7 @@ StartLimitIntervalSec=0
 User=kenneyparty
 Group=kenneyparty
 WorkingDirectory=/srv/kenney-party/current
-# Node 22 strips the TypeScript only when asked.
-ExecStart=/usr/bin/node --experimental-strip-types --disable-warning=ExperimentalWarning /srv/kenney-party/current/server.ts
+ExecStart=/usr/bin/node /srv/kenney-party/current/server.js
 Environment=NODE_ENV=production
 Environment=NODE_OPTIONS=--max-old-space-size=128
 # Loopback only. 8080-8082 are novacharter, foxglovefair and doublecross.
