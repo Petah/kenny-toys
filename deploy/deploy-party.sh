@@ -6,7 +6,7 @@
 # The static games go out with deploy.sh; this is only the small Node service that TV + phone
 # games talk through, so it's needed only when party/ changes. Like deploy.sh it ships the
 # committed HEAD. Node runs server.ts directly (type stripping), so there's no build: a release is
-# server.ts, a package.json and the one dependency, ws. The first run also creates the service
+# server.ts, a package.json and the one dependency, ws (the unit runs Node with type stripping on). The first run also creates the service
 # user and installs the systemd unit. It needs root over SSH, since the deploy user can't manage
 # services.
 set -euo pipefail
