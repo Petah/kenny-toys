@@ -25,6 +25,11 @@ export const SFX = {
   over: [`${VOICE}/game_over.ogg`],
   sad: [`${PIZZ}/jingles-pizzicato_09.ogg`],
   click: [1, 2].map((n) => `${UI}/click_00${n}.ogg`),
+  // Party play.
+  join: [`${UI}/confirmation_001.ogg`],
+  yourTurn: [`${UI}/maximize_001.ogg`],
+  cheer: [`${UI}/bong_001.ogg`],
+  win: [`${VOICE}/congratulations.ogg`],
 } satisfies SfxGroups;
 
 export const MUSIC = 'Audio/Music Loops/Loops/Farm Frolics.ogg';

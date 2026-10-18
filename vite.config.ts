@@ -15,6 +15,10 @@ export default defineConfig({
       sharedAssets: ['Other/Fonts/Kenney Future.ttf', 'Other/Fonts/Kenney Bold.ttf', 'Icons/Game Icons/Spritesheet/sheet_white2x.{png,xml}'],
     }),
   ],
+  server: {
+    // The party relay (npm run party) for TV + phone games.
+    proxy: { '/party': { target: 'http://127.0.0.1:8083', ws: true } },
+  },
   build: {
     // Each engine gets its own chunk so the browser caches it once for every game that uses it.
     // Phaser is ~1.3 MB; Rapier's compat build inlines its WebAssembly and is ~2.9 MB (1.1 MB gzipped).
@@ -29,9 +33,10 @@ export default defineConfig({
           ],
         },
       },
-      // One page per game, plus the launcher at the root.
+      // One page per game, plus the launcher at the root and the phones' join page.
       input: {
         main: path.resolve(import.meta.dirname, 'index.html'),
+        join: path.resolve(import.meta.dirname, 'join/index.html'),
         ...Object.fromEntries(readGameManifests().map((g) => [g.id, path.join(GAMES_DIR, g.id, 'index.html')])),
       },
     },

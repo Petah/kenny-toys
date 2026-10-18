@@ -1,4 +1,5 @@
 import RAPIER from '@dimforge/rapier3d-compat';
+import { PEDESTAL_HALF, PEDESTAL_HEIGHT } from './sizes.ts';
 
 /**
  * The tower: a grass pedestal and the pets dropped on it, in Rapier with no three.js, so the
@@ -20,9 +21,7 @@ export const DROP_GAP = 0.7;
  * head's top slopes from its middle to its edges, as a share of its height.
  */
 export const FEEL = { angularDamping: 5, linearDamping: 0.6, friction: 1.2, pedestalFriction: 1, crown: 0.04, maxFall: 4 };
-/** The pedestal's top is at y = 0; its half width and its height. */
-export const PEDESTAL_HALF = 1.66;
-export const PEDESTAL_HEIGHT = 3.2;
+export { PEDESTAL_HALF, PEDESTAL_HEIGHT } from './sizes.ts';
 /** A pet whose centre sinks this far below the pedestal's top has fallen off. */
 const FALLEN_Y = -1.2;
 /** Speeds under which a pet counts as still. */

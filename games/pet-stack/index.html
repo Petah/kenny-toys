@@ -56,6 +56,65 @@
       @media (pointer: coarse) { #title .keys.mouse { display: none; } }
       @media (pointer: fine) { #title .keys.touch { display: none; } }
       body.on-title .hud, body.on-title #touch, body.on-title #ring, body.on-title #bestline { display: none !important; }
+      #title .party-btn { display: block; margin: 14px auto 0; font-size: 18px; padding: 10px 22px; text-shadow: none; }
+      @media (pointer: coarse) { #title .party-btn { display: none; } }
+
+      /* Party play: the TV's lobby, player strip and results. */
+      body.party #hearts, body.party #touch, body.party #hint { display: none !important; }
+      body:not(.party) #seats, body:not(.party) #who { display: none !important; }
+      #lobby, #results { background: rgba(30, 60, 40, 0.25); place-items: start center; padding-top: 5vh; overflow: auto; }
+      #lobby > div, #results > div { width: min(860px, 94vw); padding: 24px 30px 20px; }
+      #lobby h2 { font-size: clamp(30px, 4.6vw, 52px); }
+      .lobby-row { display: flex; gap: 28px; align-items: center; justify-content: center; margin: 4px 0 16px; }
+      #lobby-qr { width: clamp(150px, 22vw, 230px); aspect-ratio: 1; background: #fff; border-radius: 14px; padding: 6px; flex: none; }
+      #lobby-qr svg { display: block; width: 100%; height: 100%; }
+      .lobby-join { text-align: left; }
+      .lobby-join p { margin: 0 0 4px; font-size: clamp(14px, 1.8vw, 20px); }
+      .lobby-join .url { font-size: clamp(18px, 2.6vw, 30px); margin-bottom: 18px; word-break: break-all; }
+      .lobby-join .code { font-size: clamp(54px, 9vw, 104px); letter-spacing: 0.12em; line-height: 1; margin-top: 0.22em; color: #fff;
+        text-shadow: 0 5px 0 var(--shade); }
+      .lobby-rules { font-family: 'Kenney Future', sans-serif; font-size: clamp(13px, 1.6vw, 17px); color: #fff !important; }
+      .chips { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 0; margin: 0 0 14px; min-height: 58px; }
+      .chips li { display: flex; align-items: center; gap: 8px; padding: 5px 16px 5px 6px; border-radius: 30px; background: rgba(0,0,0,0.22);
+        border: 3px solid var(--seat); font-size: clamp(18px, 2.2vw, 24px); animation: pop 0.35s cubic-bezier(.2,1.6,.4,1); }
+      .chips li img { width: 44px; height: 44px; }
+      .chips li.offline { opacity: 0.4; }
+      .chips li b { color: var(--gold); font-weight: normal; min-width: 1.2em; }
+      #results-list { flex-direction: column; align-items: center; }
+      #results-list li:first-child { font-size: clamp(24px, 3vw, 32px); }
+      #results-list li:first-child img { width: 60px; height: 60px; }
+      #results h2 { font-size: clamp(36px, 6vw, 64px); }
+      .card button:disabled { opacity: 0.45; cursor: default; }
+      .sound-note { font-family: 'Kenney Future', sans-serif; font-size: 13px; color: #fff !important; opacity: 0.8; }
+      #lobby.heard .sound-note { display: none; }
+      #lobby .offline-note { display: none; color: #ffb3a8 !important; }
+      #lobby.offline .offline-note { display: block; }
+      @keyframes pop { from { transform: scale(0.3); opacity: 0; } }
+
+      #seats { position: fixed; z-index: 4; left: 0; right: 0; bottom: 14px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+        padding: 0 12px; pointer-events: none; font-family: 'Kenney Bold', sans-serif; color: #fff; }
+      body.on-title #seats { display: none; }
+      .seat { display: flex; align-items: center; gap: 6px; padding: 4px 14px 4px 4px; border-radius: 16px; background: rgba(30, 60, 40, 0.55);
+        border: 3px solid transparent; transition: transform 0.25s cubic-bezier(.2,1.6,.4,1), opacity 0.3s, border-color 0.2s; }
+      .seat .pet { width: 46px; height: 46px; }
+      .seat span { display: block; font-size: 18px; color: var(--seat); text-shadow: 0 2px 0 rgba(0,0,0,0.4); }
+      .seat .hs { display: flex; gap: 2px; min-height: 20px; }
+      .seat .hs img { width: 20px; height: 20px; }
+      .seat .hs img.lost { filter: grayscale(1) brightness(0.8); opacity: 0.4; }
+      .seat em { font: 12px 'Kenney Future', sans-serif; color: var(--gold); font-style: normal; }
+      .seat.current { border-color: var(--seat); transform: translateY(-8px) scale(1.12); background: rgba(30, 60, 40, 0.8); }
+      .seat.out { opacity: 0.4; }
+      .seat.out .pet { filter: grayscale(1); }
+      .seat.offline:not(.out) { opacity: 0.6; }
+      #who { position: fixed; z-index: 4; display: none; pointer-events: none; transform: translate(-50%, calc(-100% - 30px));
+        padding: 4px 14px; border-radius: 14px; background: var(--seat); color: #fff; font: 20px 'Kenney Bold', sans-serif;
+        text-shadow: 0 2px 0 rgba(0,0,0,0.3); box-shadow: 0 4px 0 rgba(0,0,0,0.2); white-space: nowrap; }
+      .cheer { position: fixed; z-index: 7; font-size: 46px; pointer-events: none; transform: translate(-50%, 0); animation: cheer 1.6s ease-out forwards; }
+      @keyframes cheer {
+        0% { transform: translate(-50%, 0) scale(0.4); opacity: 0; }
+        15% { transform: translate(-50%, -30px) scale(1.15); opacity: 1; }
+        100% { transform: translate(calc(-50% + var(--drift)), -220px) scale(1); opacity: 0; }
+      }
     </style>
   </head>
   <body class="on-title">
@@ -68,6 +127,8 @@
     <div id="bestline">BEST</div>
     <div id="banner" class="hud"></div>
     <div id="hint" class="hud"></div>
+    <div id="seats"></div>
+    <div id="who"></div>
     <div id="touch"><button id="t-left" class="tb" aria-label="Turn left">⟲</button><button id="t-right" class="tb" aria-label="Turn right">⟳</button></div>
     <div id="over" class="card"><div>
       <h2 id="over-title">Tower down!</h2>
@@ -81,6 +142,33 @@
       <p id="title-best"></p>
       <p class="keys mouse">Move to aim · click to drop · right-click, wheel or arrows to turn</p>
       <p class="keys touch">Drag to aim · let go to drop · buttons turn the pet</p>
+      <button id="title-party" class="btn party-btn">Party: TV + phones</button>
+    </div></div>
+    <div id="lobby" class="card"><div>
+      <h2>Pet Stack Party</h2>
+      <div class="lobby-row">
+        <div id="lobby-qr"></div>
+        <div class="lobby-join">
+          <p>Join on your phone at</p>
+          <div id="lobby-url" class="url">…</div>
+          <p>with the code</p>
+          <div id="lobby-code" class="code">····</div>
+        </div>
+      </div>
+      <ul id="lobby-players" class="chips"></ul>
+      <p id="lobby-note"></p>
+      <button id="lobby-go" class="btn" disabled>Start</button>
+      <p class="lobby-rules">Take turns dropping a pet from your phone. Knock any off and you lose a heart. Last one standing wins.</p>
+      <p class="offline-note">Can't reach the party server, trying again…</p>
+      <p class="sound-note">Click or press a key on this screen for sound</p>
+    </div></div>
+    <div id="results" class="card"><div>
+      <h2 id="results-title">Winner!</h2>
+      <p id="results-height"></p>
+      <ul id="results-list" class="chips"></ul>
+      <p id="results-note"></p>
+      <button id="results-go" class="btn">Play again</button>
+      <p class="lobby-rules">More players can join with the code <span id="results-code"></span></p>
     </div></div>
     <script type="module" src="./src/main.ts"></script>
   </body>

@@ -4,6 +4,7 @@ import { load, save } from '@shared/storage';
 import { MUSIC } from './assets.ts';
 import { makeIcons } from '@shared/model-icons';
 import { PETS, type PetKind } from './pets.ts';
+import { REACH } from './sizes.ts';
 import { DROP_GAP, PEDESTAL_HALF, PEDESTAL_HEIGHT, STEP, Stack, extent, type Pet, type PetShape } from './stack.ts';
 
 export interface PetModel {
@@ -12,7 +13,7 @@ export interface PetModel {
   shape: PetShape;
 }
 
-type State = 'title' | 'aim' | 'drop' | 'over';
+export type State = 'title' | 'aim' | 'drop' | 'over';
 type Clip = 'idle' | 'walk' | 'run' | 'dance' | 'gesture-positive' | 'gesture-negative' | 'static';
 
 /** A pet's model with its own animations, in the air or on the tower. */
@@ -39,10 +40,8 @@ interface Puff {
 }
 
 /** 1 world unit is 10cm: a pet stands about 15cm tall. */
-const CM = 10;
-const HEARTS = 3;
-/** How far the hanging pet can go either side. */
-const REACH = PEDESTAL_HALF + 1.6;
+export const CM = 10;
+export const HEARTS = 3;
 const MOVE_SPEED = 5;
 /** Seconds to drop each pet: generous at first, then quicker. */
 const aimTime = (placed: number) => Math.max(6, 11 - placed * 0.25);
@@ -51,7 +50,7 @@ const MAX_WAIT = 5;
 /** Seconds a fallen pet tumbles before it vanishes in a puff. */
 const FALLEN_LINGER = 1.4;
 /** The first pets are flat-headed ones, to get going. */
-const EASY: PetKind[] = ['beaver', 'panda', 'polar', 'koala', 'elephant', 'pig', 'dog', 'hog'];
+export const EASY: PetKind[] = ['beaver', 'panda', 'polar', 'koala', 'elephant', 'pig', 'dog', 'hog'];
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const Z = new THREE.Vector3(0, 0, 1);
@@ -63,31 +62,31 @@ export class StackGame {
   private sun = new THREE.DirectionalLight(0xfff4e0, 2.4);
   private timer = new THREE.Timer();
 
-  private state: State = 'title';
-  private stack!: Stack;
-  private views: PetView[] = [];
+  protected state: State = 'title';
+  protected stack!: Stack;
+  protected views: PetView[] = [];
   private puffs: Puff[] = [];
-  private bag: PetKind[] = [];
-  private nextKind: PetKind = 'beaver';
+  protected bag: PetKind[] = [];
+  protected nextKind: PetKind = 'beaver';
 
   /** The pet waiting to be dropped. */
-  private held?: PetView;
-  private aimX = 0;
-  private angle = 0;
+  protected held?: PetView;
+  protected aimX = 0;
+  protected angle = 0;
   /** The angle drawn, which swings round to `angle`. */
   private shownAngle = 0;
   private holdY = 2;
-  private aimLeft = 0;
+  protected aimLeft = 0;
   private wait = 0;
-  private turn = 0;
+  protected turn = 0;
   /** The turn a heart was last lost on, so one bad drop costs only one heart. */
-  private heartTurn = -1;
-  private hearts = HEARTS;
-  private placed = 0;
-  private runBest = 0;
-  private best = load<number>('pet-stack:best', 0);
+  protected heartTurn = -1;
+  protected hearts = HEARTS;
+  protected placed = 0;
+  protected runBest = 0;
+  protected best = load<number>('pet-stack:best', 0);
   private cheeredBest = false;
-  private overIn = 0;
+  protected overIn = 0;
   private acc = 0;
   private lastKnock = 0;
   private lastTick = 0;
@@ -98,18 +97,18 @@ export class StackGame {
   private wheelAt = 0;
   private camY = 0;
   private camDist = 14;
-  private shake = 0;
+  protected shake = 0;
   private bestLine: THREE.Group;
   private titlePet?: PetView;
   private ray = new THREE.Raycaster();
   private clouds: THREE.Group[] = [];
-  private icons: Record<string, string>;
+  protected icons: Record<string, string>;
 
   constructor(
     stage: HTMLElement,
-    private models: Record<string, PetModel>,
+    protected models: Record<string, PetModel>,
     private scenery: Record<string, THREE.Object3D>,
-    private sounds: Sounds,
+    protected sounds: Sounds,
     createRenderer: (parent: HTMLElement, camera: THREE.PerspectiveCamera) => THREE.WebGLRenderer,
   ) {
     this.renderer = createRenderer(stage, this.camera);
@@ -298,7 +297,7 @@ export class StackGame {
 
   // ---- Flow --------------------------------------------------------------------------------
 
-  private showTitle() {
+  protected showTitle() {
     this.state = 'title';
     document.body.classList.add('on-title');
     $('title').classList.add('show');
@@ -313,7 +312,7 @@ export class StackGame {
     this.camDist = 12;
   }
 
-  private start() {
+  protected start() {
     this.sounds.play('click');
     void this.sounds.music(MUSIC, 0.18);
     if (this.titlePet) {
@@ -345,7 +344,7 @@ export class StackGame {
   }
 
   /** Hangs the next pet over the tower. */
-  private nextPet() {
+  protected nextPet() {
     this.state = 'aim';
     const kind = this.nextKind;
     this.nextKind = this.draw();
@@ -356,7 +355,7 @@ export class StackGame {
     this.angle = this.turn < 3 ? 0 : (Math.floor(Math.random() * 4) * Math.PI) / 2;
     this.shownAngle = this.angle;
     this.holdY = this.wantedHoldY();
-    this.aimLeft = aimTime(this.placed);
+    this.aimLeft = this.aimSeconds();
     this.lastTick = Math.ceil(this.aimLeft);
   }
 
@@ -368,13 +367,13 @@ export class StackGame {
     return top + DROP_GAP - extent(this.models[this.held.kind].shape, this.angle).minY;
   }
 
-  private turnHeld(dir: 1 | -1) {
+  protected turnHeld(dir: 1 | -1) {
     if (this.state !== 'aim') return;
     this.angle += (dir * Math.PI) / 2;
     this.sounds.play('turn', { volume: 0.4 });
   }
 
-  private dropHeld() {
+  protected dropHeld() {
     if (this.state !== 'aim' || !this.held) return;
     const view = this.held;
     // Let go from where it's drawn, but never inside something, even if the hanging height is
@@ -391,7 +390,7 @@ export class StackGame {
     this.hint('');
   }
 
-  private loseHeart() {
+  protected loseHeart() {
     if (this.heartTurn === this.turn || this.hearts <= 0) return;
     this.heartTurn = this.turn;
     this.hearts--;
@@ -402,7 +401,7 @@ export class StackGame {
     else this.overIn = 1.6;
   }
 
-  private gameOver() {
+  protected gameOver() {
     this.state = 'over';
     if (this.held) {
       this.scene.remove(this.held.root);
@@ -428,7 +427,7 @@ export class StackGame {
 
   // ---- Each frame --------------------------------------------------------------------------
 
-  private frame(t: number) {
+  protected frame(t: number) {
     this.timer.update(t);
     const dt = Math.min(this.timer.getDelta(), 0.05);
 
@@ -528,8 +527,26 @@ export class StackGame {
     }
   }
 
-  private afterDrop() {
-    if (this.hearts <= 0) {
+  /** Seconds to aim this pet. */
+  protected aimSeconds() {
+    return aimTime(this.placed);
+  }
+
+  /** True once the game has been lost and no more pets should come. */
+  protected finished() {
+    return this.hearts <= 0;
+  }
+
+  /** A new metre wins back a heart; returns what the banner says about it. */
+  protected healOnMetre(): string {
+    if (this.hearts >= HEARTS) return '';
+    this.hearts++;
+    this.drawHearts();
+    return 'Heart back!';
+  }
+
+  protected afterDrop() {
+    if (this.finished()) {
       this.state = 'over';
       return;
     }
@@ -541,7 +558,7 @@ export class StackGame {
   }
 
   /** Height so far, best of the run, and the cheers for each metre and a new record. */
-  private updateHeight() {
+  protected updateHeight() {
     const h = this.stack.height();
     const cm = Math.round(h * CM);
     $('height').innerHTML = `${cm}<small>cm</small>`;
@@ -552,12 +569,8 @@ export class StackGame {
     const metre = Math.floor((this.runBest * CM) / 100);
     if (metre > Math.floor((before * CM) / 100)) {
       // Each new metre wins back a heart.
-      const heal = this.hearts < HEARTS;
-      if (heal) {
-        this.hearts++;
-        this.drawHearts();
-      }
-      this.banner(`${metre}m!`, heal ? 'Heart back!' : metre === 1 ? 'A metre of pets' : 'Keep stacking');
+      const heal = this.healOnMetre();
+      this.banner(`${metre}m!`, heal || (metre === 1 ? 'A metre of pets' : 'Keep stacking'));
       this.sounds.play('metre', { volume: 0.5 });
       this.dance();
     }
@@ -569,12 +582,12 @@ export class StackGame {
     }
   }
 
-  private dance() {
+  protected dance() {
     for (const v of this.views) if (v.pet?.state === 'landed') this.play(v, 'dance');
     this.danceFor = 2.6;
   }
 
-  private updateAim(dt: number) {
+  protected updateAim(dt: number) {
     const held = this.held!;
     const dir = (this.keys.has('ArrowRight') || this.keys.has('KeyD') ? 1 : 0) - (this.keys.has('ArrowLeft') || this.keys.has('KeyA') ? 1 : 0);
     if (dir) this.aimX += dir * MOVE_SPEED * dt;
@@ -617,14 +630,14 @@ export class StackGame {
   }
 
   /** The timer ring over the held pet and the best line's label. */
-  private updateOverlays() {
+  protected updateOverlays() {
     const ring = $('ring');
     if (this.state === 'aim' && this.held) {
       const p = this.screen(new THREE.Vector3(this.aimX, this.holdY + extent(this.models[this.held.kind].shape, this.angle).maxY + 0.7, 0));
       ring.style.display = 'block';
       ring.style.left = `${p.x}px`;
       ring.style.top = `${p.y}px`;
-      const frac = Math.max(0, this.aimLeft / aimTime(this.placed));
+      const frac = Math.max(0, this.aimLeft / this.aimSeconds());
       const c = 2 * Math.PI * 18;
       const front = ring.querySelector<SVGCircleElement>('.front')!;
       front.style.strokeDasharray = `${c}`;
@@ -685,7 +698,7 @@ export class StackGame {
     }
   }
 
-  private drawHearts() {
+  protected drawHearts() {
     const box = $('hearts');
     box.replaceChildren(
       ...Array.from({ length: HEARTS }, (_, i) => {
@@ -699,7 +712,7 @@ export class StackGame {
   }
 
   private bannerTimer = 0;
-  private banner(text: string, sub = '') {
+  protected banner(text: string, sub = '') {
     const b = $('banner');
     b.innerHTML = sub ? `${text}<small>${sub}</small>` : text;
     b.classList.add('show');
@@ -707,7 +720,7 @@ export class StackGame {
     this.bannerTimer = window.setTimeout(() => b.classList.remove('show'), 1400);
   }
 
-  private hint(text: string) {
+  protected hint(text: string) {
     const h = $('hint');
     if (text) h.textContent = text;
     h.style.opacity = text ? '1' : '0';
@@ -725,19 +738,25 @@ export class StackGame {
     return this.ray.ray.intersectPlane(plane, hit) ? hit.x : this.aimX;
   }
 
-  private bindInput() {
+  /** Whether this screen's own mouse, keys and touch steer the pet (not in party play). */
+  protected localControl() {
+    return true;
+  }
+
+  protected bindInput() {
     const stage = this.renderer.domElement;
     stage.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      this.turnHeld(1);
+      if (this.localControl()) this.turnHeld(1);
     });
     stage.addEventListener('pointerdown', (e) => {
-      if (e.button === 2) return;
+      if (e.button === 2 || !this.localControl()) return;
       const touch = e.pointerType !== 'mouse';
       this.drag = { id: e.pointerId, startX: this.worldX(e.clientX, e.clientY), aimX: this.aimX, moved: false, touch };
       stage.setPointerCapture(e.pointerId);
     });
     stage.addEventListener('pointermove', (e) => {
+      if (!this.localControl()) return;
       const x = this.worldX(e.clientX, e.clientY);
       if (this.drag?.id === e.pointerId && this.drag.touch) {
         // Fingers drag the pet from wherever they land, so they needn't cover it.
@@ -757,7 +776,7 @@ export class StackGame {
       'wheel',
       (e) => {
         e.preventDefault();
-        if (performance.now() - this.wheelAt < 180) return;
+        if (!this.localControl() || performance.now() - this.wheelAt < 180) return;
         this.wheelAt = performance.now();
         this.turnHeld(e.deltaY > 0 ? 1 : -1);
       },
@@ -773,6 +792,7 @@ export class StackGame {
         this.start();
         return;
       }
+      if (!this.localControl()) return;
       if (['ArrowUp', 'KeyW', 'KeyX', 'KeyR'].includes(e.code)) this.turnHeld(1);
       if (e.code === 'KeyZ' || e.code === 'KeyQ') this.turnHeld(-1);
       if (['Space', 'ArrowDown', 'KeyS', 'Enter'].includes(e.code)) {
@@ -783,7 +803,8 @@ export class StackGame {
     window.addEventListener('keyup', (e) => this.keys.delete(e.code));
     window.addEventListener('blur', () => this.keys.clear());
 
-    for (const [id, dir] of [['t-left', -1], ['t-right', 1]] as const) {
+    // Positive turns are anticlockwise (about the axis facing the camera), matching the ⟲ button.
+    for (const [id, dir] of [['t-left', 1], ['t-right', -1]] as const) {
       const b = $(id);
       b.addEventListener('pointerdown', (e) => {
         e.preventDefault();

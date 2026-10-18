@@ -4,7 +4,8 @@ import { readGlbParts } from '@shared/glb';
 import { setupGamePage } from '@shared/shell';
 import { createRenderer, loadGlb, shareMaterials } from '@shared/three';
 import { PET_DIR, SCENERY, SCENERY_DIR, SFX } from './assets.ts';
-import { StackGame, type PetModel } from './game.ts';
+import type { PetModel } from './game.ts';
+import { PartyStack } from './party.ts';
 import { PETS } from './pets.ts';
 import { initPhysics, shapeOf } from './stack.ts';
 
@@ -25,8 +26,10 @@ shareMaterials(scenery.map(([, scene]) => scene));
 const models: Record<string, PetModel> = Object.fromEntries(
   pets.map(([kind, glb]) => [kind, { scene: glb.gltf.scene, clips: glb.gltf.animations, shape: shapeOf(readGlbParts(glb.buffer)) }]),
 );
-const game = new StackGame(document.querySelector('#stage')!, models, Object.fromEntries(scenery) as Record<string, THREE.Object3D>, sounds, createRenderer);
+const game = new PartyStack(document.querySelector('#stage')!, models, Object.fromEntries(scenery) as Record<string, THREE.Object3D>, sounds, createRenderer);
 document.body.classList.remove('loading');
+document.getElementById('title-party')!.addEventListener('click', () => game.enterParty());
+if (new URLSearchParams(location.search).has('party')) game.enterParty();
 
 // Handy for poking at the game from devtools and automated checks.
 if (import.meta.env.DEV) Object.assign(window, { stack: game });

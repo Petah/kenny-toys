@@ -7,16 +7,20 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "party": "node party/server.ts"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "^0.20.0",
     "phaser": "^4.2.1",
-    "three": "^0.186.0"
+    "qrcode-generator": "^2.0.4",
+    "three": "^0.186.0",
+    "ws": "^8.21.3"
   },
   "devDependencies": {
     "@types/node": "^26.5.1",
     "@types/three": "^0.186.0",
+    "@types/ws": "^8.18.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.0",
     "wordlist-english": "^1.2.1"

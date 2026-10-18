@@ -44,6 +44,7 @@ npm install
 npm run dev        # http://localhost:5173: the launcher and every game
 npm run build      # typecheck, then build to dist/
 npm run preview    # serve dist/
+npm run party      # the party relay on :8083, for TV + phone play (dev proxies /party to it)
 ```
 
 ## How it works
@@ -57,8 +58,11 @@ shared/           Runtime code every game can use
   shell.ts          setupGamePage(): theme, Kenney fonts, back-to-launcher link
   phaser.ts         createGame() (fills parent) / createFixedGame() (letterboxed), sfx helpers
   storage.ts        Guarded localStorage and high scores
+  party.ts          PartyHost (the TV) and PartyPlayer (a phone), both reconnecting
   theme.css         Colours, buttons, fonts
 launcher/         The root index page
+join/             The phones' page for party play: enter the TV's code and a name
+party/server.ts   The party relay (Node + ws): rooms with a code, passing JSON between TV and phones
 games/<id>/       One folder per game
   game.json         Title, description, thumbnail, asset globs
   index.html        Page entry
@@ -82,6 +86,10 @@ The asset bundle has about 91,000 files, so nothing is copied into the repo:
 
 The launcher and the build pick up new games automatically. The checklist and conventions (play-testing, phone support, commits) are in [`PLAN.md`](PLAN.md).
 
+### Party play (TV + phones)
+
+A game can run on a TV with phones as controllers, Jackbox-style. The TV opens a room through `PartyHost` and shows a QR code and four-letter code; phones go to `/join/`, and once they're in, the join page loads the game's `games/<id>/src/controller.ts` (it exports `mount()`, see `shared/party-controller.ts`). The relay in `party/server.ts` only passes messages, so each game owns its protocol. Pet Stack is the first: `?party` on its page (or the title's Party button) opens the lobby.
+
 ## Deploying
 
 ```sh
@@ -89,6 +97,8 @@ deploy/deploy.sh
 ```
 
 The script builds a clean export of the committed `HEAD` locally, because CI doesn't have the asset bundle. It copies the build to the server over Tailscale as a timestamped release in `/var/www/kenney-toys/releases/`, then swaps the `current` link to it in one step. Uncommitted changes never ship. The last five releases are kept, so you can roll back by pointing `current` at an older one.
+
+The party relay is a separate small service, shipped with `deploy/deploy-party.sh` when `party/` changes (as root: it installs `deploy/kenney-party.service` and restarts it). It runs on `127.0.0.1:8083` and Caddy sends `toys.projectz.co.nz/party/*` to it.
 
 Requests reach the site like this, all one-time setup that's already done:
 1. **Cloudflare DNS:** `toys.projectz.co.nz` is a proxied CNAME to the `home-web-platform` Cloudflare Tunnel.

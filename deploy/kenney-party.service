@@ -1,0 +1,68 @@
+# Kenney Toys party relay: passes messages between a game on a TV and the phones playing it.
+# Installed to /etc/systemd/system/ by deploy/deploy-party.sh. Caddy proxies
+# toys.projectz.co.nz/party/* to it; nothing else talks to it. Rooms live in memory only.
+
+[Unit]
+Description=Kenney Toys party relay (TV + phone games)
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+User=kenneyparty
+Group=kenneyparty
+WorkingDirectory=/srv/kenney-party/current
+ExecStart=/usr/bin/node /srv/kenney-party/current/server.ts
+Environment=NODE_ENV=production
+Environment=NODE_OPTIONS=--max-old-space-size=128
+# Loopback only. 8080-8082 are novacharter, foxglovefair and doublecross.
+Environment=HOST=127.0.0.1
+Environment=PORT=8083
+
+Restart=always
+RestartSec=2
+KillSignal=SIGTERM
+TimeoutStopSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=kenney-party
+
+# Hardening, as for the other Node services on this box. It only ever talks to localhost.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateMounts=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+ProcSubset=pid
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources @obsolete @mount
+SystemCallErrorNumber=EPERM
+# V8 needs writable-then-executable JIT pages.
+MemoryDenyWriteExecute=no
+CapabilityBoundingSet=
+AmbientCapabilities=
+IPAddressDeny=any
+IPAddressAllow=localhost
+
+MemoryMax=256M
+MemoryHigh=192M
+TasksMax=64
+LimitNOFILE=16384
+LimitCORE=0
+
+[Install]
+WantedBy=multi-user.target
